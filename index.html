@@ -2276,6 +2276,672 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 
 </style>
+<style>/*
+ * Dojazd: sekcja po FAQ, przed Kontaktem (Igor, 20.10.2026), układ lokalizacji holaskin.clinic bez cięcia na pół.
+ * Komputer: mapa od 10% szerokości do prawej krawędzi, na całą wysokość; przykrywa ją warstwa w kolorze tła z miękkim
+ * brzegiem pod skosem (kilka przystanków, bez linii). W lewej części wyśrodkowane: tytuł „ZAPRASZAM / do studia”
+ * (vs_tytul), zdjęcie salonu (gdy jest w danych), adres z „Wyznacz trasę” i ocena z opinii jak w hero (vs_ocena).
+ * Telefon: mapa na górze, pochylony miękki brzeg od dołu, pod mapą treść.
+ * Ruch (Igor: „gradient jako taka fala przechodzi i zatrzymuje się i nagle widać pinezkę, która wpada na mapę”):
+ * na dole pliku, jedna sekwencja w czasie po klasie is-fala (view.js: sekcja widoczna i mapa gotowa).
+ * Mapa jak wyblakła odbitka: kafle OpenStreetMap w szarości i ciepłym tonie, mało kontrastu (jak mapa Hola Skin).
+ * Gesty (mobile-native): na dotyku jeden palec przewija stronę, mapę powiększa się dwoma palcami; kółko myszy
+ * nie powiększa mapy, tylko przewija stronę.
+ */
+
+/* Tło: beż z 6% bordo (jak Hasło), bo FAQ nad nią jest na czystym beżu (LEKCJE, punkt 19). */
+.vs-dojazd {
+	--vs-dojazd-tlo: color-mix(in srgb, var(--vs-ciemne) 6%, var(--vs-jasne));
+	/* Ląd OpenStreetMap po filtrze kafli: tło płótna w tym kolorze, więc szczeliny między kaflami są niewidoczne. */
+	--vs-dojazd-lad: #e2dcd1;
+	/* Miejsce znacznika na mapie (od lewej krawędzi mapy); view.js przesuwa mapę tak, żeby adres stał właśnie tu. */
+	--vs-dojazd-punkt-x: 50%;
+	/* Wysokość przejścia mapy w tło na telefonie (podpis mapy stoi nad nim). */
+	--vs-dojazd-zanik: clamp(150px, 46vw, 230px);
+	position: relative;
+	background: var(--vs-dojazd-tlo);
+	color: var(--vs-na-jasnym);
+}
+
+/* Mapa: na telefonie blok na górze, na komputerze od 10% szerokości do prawej krawędzi, na całą wysokość. */
+.vs-dojazd__mapa {
+	position: relative;
+	margin: 0;
+}
+
+.vs-dojazd__plotno {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	aspect-ratio: 1;
+	background: var(--vs-dojazd-lad);
+}
+
+/*
+ * Przejście mapy w tło (telefon i tablet): miękki brzeg od dołu, pochylony o ok. 8°, kilka przystanków zamiast
+ * jednego (bez widocznej linii). Pełne tło od 66% wysokości: gdy fala startuje niżej (o 30%), dół mapy i tak
+ * zostaje przykryty, więc na żadnym etapie nie widać twardej krawędzi.
+ */
+.vs-dojazd__mapa::after {
+	content: "";
+	position: absolute;
+	inset: auto 0 0;
+	z-index: 1;
+	height: var(--vs-dojazd-zanik);
+	background: linear-gradient(
+		172deg,
+		transparent 0%,
+		color-mix(in srgb, var(--vs-dojazd-tlo) 35%, transparent) 26%,
+		color-mix(in srgb, var(--vs-dojazd-tlo) 75%, transparent) 46%,
+		var(--vs-dojazd-tlo) 66%
+	);
+	pointer-events: none;
+}
+
+/* Telefon i tablet: podpis OpenStreetMap nad przejściem w tło (musi być czytelny); przyciski +/− w prawym górnym rogu (view.js). */
+@media (max-width: 63.99rem) {
+	.vs-dojazd .leaflet-bottom {
+		bottom: var(--vs-dojazd-zanik);
+	}
+}
+
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+	.vs-dojazd__plotno {
+		aspect-ratio: 16 / 10;
+	}
+}
+
+.vs-dojazd__tresc {
+	position: relative;
+	z-index: 2;
+	display: grid;
+	justify-items: center;
+	gap: 40px;
+	width: min(100% - 2 * var(--vs-margines), 34rem);
+	margin-inline: auto;
+	padding-block: 8px clamp(80px, 10vw, 150px);
+	text-align: center;
+}
+
+@media (min-width: 64rem) {
+	.vs-dojazd {
+		/* Adres na 72% szerokości mapy, czyli ok. 75% sekcji: po jasnej stronie skosu, także na starcie fali. */
+		--vs-dojazd-punkt-x: 72%;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		min-height: clamp(600px, 86svh, 900px);
+	}
+
+	/* Mapa od 10%: pełna część warstwy zawsze przykrywa jej lewą krawędź, także gdy fala startuje z lewej. */
+	.vs-dojazd__mapa {
+		position: absolute;
+		inset: 0 0 0 10%;
+	}
+
+	.vs-dojazd__plotno {
+		position: absolute;
+		inset: 0;
+		aspect-ratio: auto;
+	}
+
+	.vs-dojazd__mapa::after {
+		display: none;
+	}
+
+	/*
+	 * Komputer: warstwa w kolorze tła na 74% szerokości sekcji, pełna pod treścią, dalej miękki brzeg pochylony
+	 * o 10° (pięć przystanków). Przy wjeździe wpływa falą z lewej i staje (ruch na dole pliku).
+	 */
+	.vs-dojazd::before {
+		content: "";
+		position: absolute;
+		inset: 0 auto 0 0;
+		z-index: 1;
+		width: 74%;
+		background: linear-gradient(
+			100deg,
+			var(--vs-dojazd-tlo) 0%,
+			var(--vs-dojazd-tlo) 54%,
+			color-mix(in srgb, var(--vs-dojazd-tlo) 80%, transparent) 64%,
+			color-mix(in srgb, var(--vs-dojazd-tlo) 45%, transparent) 76%,
+			color-mix(in srgb, var(--vs-dojazd-tlo) 15%, transparent) 88%,
+			transparent 100%
+		);
+		pointer-events: none;
+	}
+
+	.vs-dojazd__tresc {
+		grid-column: 1;
+		align-content: center;
+		gap: 44px;
+		width: min(100% - var(--vs-margines) - clamp(40px, 5vw, 96px), 34rem);
+		padding-block: clamp(80px, 9vw, 140px);
+	}
+}
+
+/* Mapa wjeżdża samą przezroczystością (to tło sekcji, przesunięcie wyglądałoby jak przesunięta ściana). */
+.vs-ruch .vs-dojazd__mapa[data-vs-wjazd] {
+	translate: none;
+}
+
+/* Tytuł w parze krojów, wyśrodkowany: ZAPRASZAM (Oswald) i dopisek kursywą (Playfair). */
+.vs-dojazd__tytul {
+	display: grid;
+	justify-items: center;
+	margin: 0;
+	font-size: clamp(2.5rem, 3.6vw, 3.75rem);
+	font-weight: inherit;
+	line-height: 0.9;
+}
+
+.vs-dojazd__tytul-glowna {
+	font-family: var(--wp--custom--font--naglowek);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+}
+
+.vs-dojazd__tytul-dopisek {
+	margin-top: -0.12em;
+	font-family: var(--wp--custom--font--kursywa);
+	font-style: italic;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+
+/* Zdjęcie salonu (dojazd.zdjecie): pion 2:3 jak u Hola Skin, gdy klientka je przyśle. */
+.vs-dojazd__zdjecie {
+	width: min(100%, 22rem);
+	margin: 0;
+}
+
+.vs-dojazd__zdjecie img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 2 / 3;
+	object-fit: cover;
+}
+
+.vs-dojazd__adres-blok {
+	display: grid;
+	justify-items: center;
+}
+
+.vs-dojazd__adres {
+	display: grid;
+	gap: 2px;
+	font-size: 1.0625rem;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+.vs-dojazd__ulica {
+	font-weight: 500;
+}
+
+.vs-dojazd__jak {
+	max-width: 46ch;
+	margin: 12px 0 0;
+	font-size: 0.9375rem;
+	line-height: 1.6;
+}
+
+/* Wyznacz trasę: bordowa pigułka na beżu. */
+.vs-dojazd__trasa {
+	min-height: 48px;
+	margin-top: 24px;
+	border-color: var(--vs-ciemne);
+	background: var(--vs-ciemne);
+	color: var(--vs-na-ciemnym);
+}
+
+.vs-dojazd__ikona {
+	flex: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-dojazd__trasa:hover {
+		background: transparent;
+		color: var(--vs-ciemne);
+	}
+}
+
+/* Ocena z opinii: ten sam układ co w hero (5,0 i gwiazdki | znak Booksy i „Średnia z N opinii”), w bordo na beżu. */
+.vs-dojazd__opinie {
+	padding-top: 36px;
+	border-top: 1px solid color-mix(in srgb, var(--vs-na-jasnym) 20%, transparent);
+}
+
+.vs-dojazd__ocena {
+	display: inline-flex;
+	align-items: center;
+	gap: 20px;
+	min-height: 44px;
+	color: inherit;
+	text-align: start;
+	text-decoration: none;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+	transition: scale 160ms var(--vs-ruch-wyjscie);
+}
+
+.vs-dojazd__ocena:active {
+	scale: 0.98;
+}
+
+.vs-dojazd__ocena-wynik {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+}
+
+.vs-dojazd__ocena-liczba {
+	font-family: var(--wp--custom--font--kursywa);
+	font-size: clamp(2.25rem, 2.7vw, 3.25rem);
+	font-style: italic;
+	font-weight: 500;
+	font-variant-numeric: lining-nums;
+	line-height: 0.9;
+}
+
+.vs-dojazd__ocena-gwiazdki {
+	display: flex;
+	gap: 3px;
+}
+
+.vs-dojazd__ocena-gwiazdka {
+	width: 11px;
+	height: 11px;
+	fill: currentColor;
+}
+
+.vs-dojazd__ocena-gwiazdka.is-pusta {
+	opacity: 0.3;
+}
+
+.vs-dojazd__ocena-opis {
+	display: grid;
+	align-content: center;
+	justify-items: start;
+	gap: 9px;
+	align-self: stretch;
+	padding-left: 20px;
+	border-left: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.vs-dojazd__ocena-zrodlo {
+	font-family: var(--wp--custom--font--tekst);
+	font-size: 1rem;
+	font-weight: 500;
+	line-height: 1;
+}
+
+.vs-dojazd__ocena-znak {
+	display: block;
+	width: auto;
+	height: 20px;
+}
+
+.vs-dojazd__ocena-tekst {
+	font-family: var(--wp--custom--font--tekst);
+	font-size: 0.8125rem;
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	line-height: 1.3;
+	text-underline-offset: 0.3em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-dojazd__ocena:hover .vs-dojazd__ocena-tekst {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+	}
+}
+
+/* Leaflet nadpisujemy z wyższą precyzją, bo jego arkusz dochodzi później. */
+.vs-dojazd .vs-dojazd__plotno.leaflet-container {
+	background: var(--vs-dojazd-lad);
+	font-family: var(--wp--custom--font--tekst);
+	outline-offset: -4px;
+}
+
+/* Kafle jak wyblakła odbitka: szarość, ciepły ton beżu strony, mało kontrastu (filtr stały, nie animowany). */
+.vs-dojazd .leaflet-tile-pane {
+	filter: grayscale(1) sepia(0.35) contrast(0.42) brightness(1.26);
+}
+
+/* Kafle wchodzą przejściem CSS (karta graficzna), nie animacją Leafleta liczoną w JS (fadeAnimation: false). */
+.vs-dojazd .leaflet-container .leaflet-tile {
+	opacity: 0;
+	transition: opacity 400ms ease;
+}
+
+.vs-dojazd .leaflet-container .leaflet-tile-loaded {
+	opacity: 1;
+}
+
+/*
+ * Styki kafli: Leaflet 1.9 łączy kafle trybem plus-lighter, a na telefonie (mapa na ułamku piksela po przewinięciu)
+ * styk wychodził jaśniejszą linią. Zwykłe mieszanie + tło płótna w kolorze lądu po filtrze: szczelina niewidoczna.
+ */
+.vs-dojazd .leaflet-container img.leaflet-tile {
+	mix-blend-mode: normal;
+}
+
+/* Powiększanie: kwadraty w kolorach strony, cel dotyku 44 px, w prawym dolnym rogu (z lewej mapa przechodzi w tło). */
+.vs-dojazd .leaflet-control.leaflet-bar {
+	border: 1px solid var(--vs-linia);
+	border-radius: 0;
+	box-shadow: none;
+}
+
+.vs-dojazd .leaflet-control.leaflet-bar a {
+	width: 44px;
+	height: 44px;
+	border-bottom-color: var(--vs-linia);
+	border-radius: 0;
+	background: var(--vs-jasne);
+	color: var(--vs-ciemne);
+	font: 300 22px/44px var(--wp--custom--font--tekst);
+}
+
+.vs-dojazd .leaflet-control.leaflet-bar a.leaflet-disabled {
+	color: var(--vs-linia);
+	opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-dojazd .leaflet-control.leaflet-bar a:hover {
+		background: var(--vs-ciemne);
+		color: var(--vs-na-ciemnym);
+	}
+}
+
+.vs-dojazd .leaflet-container .leaflet-control-attribution {
+	padding: 2px 8px;
+	background: color-mix(in srgb, var(--vs-jasne) 88%, transparent);
+	color: var(--vs-na-jasnym);
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.vs-dojazd .leaflet-container .leaflet-control-attribution a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+/*
+ * Pinezka z logo: bordowa etykieta z logo literowym i „Wyznacz trasę”, pod nią ogonek i znacznik w punkcie adresu.
+ * Punkt zaczepienia to środek znacznika: przed wczytaniem mapy środek płótna, potem pozycja z Leafleta.
+ */
+.vs-dojazd .vs-pinezka {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	display: grid;
+	justify-items: center;
+	/* Znacznik Leafleta nie ma szerokości: bez tego pinezka zwęża się do najwęższej treści i łamie napis. */
+	width: max-content;
+	color: var(--vs-na-ciemnym);
+	font-family: var(--wp--custom--font--tekst);
+	text-decoration: none;
+	translate: -50% calc(-100% + 7px);
+	pointer-events: auto;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+.vs-dojazd__plotno > .vs-pinezka {
+	top: 50%;
+	left: var(--vs-dojazd-punkt-x);
+}
+
+.vs-dojazd .vs-pinezka:focus-visible {
+	outline: none;
+}
+
+.vs-dojazd .vs-pinezka:focus-visible .vs-pinezka__znak {
+	outline: 2px solid var(--vs-ciemne);
+	outline-offset: 4px;
+}
+
+.vs-pinezka__cialo {
+	display: grid;
+	justify-items: center;
+}
+
+/*
+ * Awatar nad etykietą (Igor: „nad logiem profilowe w kółku klientki … tej pani, która jest w samym hero”): okrągłe
+ * zdjęcie twarzy w beżowej obwódce, lekko zachodzi na etykietę, więc pinezka mówi „tu jestem ja”.
+ */
+.vs-pinezka__awatar {
+	position: relative;
+	z-index: 1;
+	display: block;
+	width: 64px;
+	height: 64px;
+	margin-bottom: -20px;
+	overflow: hidden;
+	border: 3px solid var(--vs-jasne);
+	border-radius: 50%;
+	background: var(--vs-ciemne);
+	box-shadow:
+		0 0 0 1px var(--vs-ciemne),
+		0 12px 24px -12px rgb(67 17 16 / 0.7);
+}
+
+/* Precyzja wyżej niż w arkuszu Leafleta (tam obrazki w znacznikach dostają width: auto). */
+.vs-dojazd .vs-pinezka .vs-pinezka__awatar img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.vs-pinezka__awatar + .vs-pinezka__znak {
+	padding-top: 30px;
+}
+
+.vs-pinezka__znak {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	padding: 14px 20px 11px;
+	background: var(--vs-ciemne);
+	box-shadow: 0 14px 28px -12px rgb(67 17 16 / 0.6);
+}
+
+.vs-pinezka__znak .vs-wordmark {
+	font-size: 26px;
+}
+
+.vs-pinezka__trasa {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	line-height: 1;
+	text-transform: uppercase;
+	white-space: nowrap;
+	opacity: 0.9;
+}
+
+.vs-pinezka__ogon {
+	width: 16px;
+	height: 9px;
+	margin-top: -1px;
+	background: var(--vs-ciemne);
+	clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.vs-pinezka__punkt {
+	position: relative;
+	width: 14px;
+	height: 14px;
+	margin-top: 4px;
+	border: 2px solid var(--vs-jasne);
+	border-radius: 50%;
+	background: var(--vs-akcent);
+	box-shadow: 0 0 0 1px var(--vs-ciemne);
+}
+
+.vs-pinezka__fala {
+	position: absolute;
+	inset: -2px;
+	border: 1.5px solid var(--vs-akcent);
+	border-radius: 50%;
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Najechanie: pinezka lekko się unosi, strzałka „Wyznacz trasę” idzie w prawo. */
+.vs-pinezka__awatar,
+.vs-pinezka__znak,
+.vs-pinezka__ogon {
+	transition: translate 200ms var(--vs-ruch-wyjscie);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-pinezka:hover .vs-pinezka__awatar,
+	.vs-pinezka:hover .vs-pinezka__znak,
+	.vs-pinezka:hover .vs-pinezka__ogon {
+		translate: 0 -3px;
+	}
+
+	.vs-pinezka:hover .vs-strzalka {
+		translate: 3px 0;
+	}
+}
+
+.vs-pinezka:active .vs-pinezka__znak {
+	scale: 0.98;
+}
+
+/*
+ * Ruch sekcji (Igor, 20.10.2026: „ten gradient jako taka fala przechodzi i zatrzymuje się i nagle widać pinezkę,
+ * która wpada na mapę, i widać ten punkt … wszystko estetyczne”). Jedna sekwencja w czasie, raz, po klasie is-fala
+ * (view.js: sekcja w 35% na ekranie i mapa z kaflami gotowa; najpóźniej 3 s po wejściu):
+ *   0 ms     fala: warstwa w kolorze tła wpływa z lewej (komputer: -22% szerokości warstwy do 0; telefon: brzeg
+ *            od dołu stoi niżej o 30% i podnosi się na miejsce), 1600 ms, easeInOutCubic (łagodniej niż
+ *            zasłona Kontaktu tuż niżej, żeby dwa sąsiednie ruchy się nie zlały);
+ *   1250 ms  pinezka (awatar, logo, ogonek) spada z 48 px: spadanie z przyspieszeniem, lekkie odbicie 5 px, osiada;
+ *   1720 ms  w chwili lądowania pojawia się punkt i rozchodzi się z niego jedna fala.
+ * Urządzenie (scroll-craft): wejście z bocznym przypływem i upadkiem, nie wycieranie (reveal) jak w Kontakcie.
+ * Tylko transform i opacity. Bez JavaScriptu i przy ograniczonym ruchu wszystko stoi na miejscu od razu.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	@media (min-width: 64rem) {
+		.vs-ruch .vs-dojazd:not(.is-fala)::before {
+			translate: -22% 0;
+		}
+
+		.vs-ruch .vs-dojazd.is-fala::before {
+			transition: translate 1600ms cubic-bezier(0.65, 0, 0.35, 1);
+		}
+	}
+
+	@media (max-width: 63.99rem) {
+		.vs-ruch .vs-dojazd:not(.is-fala) .vs-dojazd__mapa::after {
+			translate: 0 30%;
+		}
+
+		.vs-ruch .vs-dojazd.is-fala .vs-dojazd__mapa::after {
+			transition: translate 1600ms cubic-bezier(0.65, 0, 0.35, 1);
+		}
+	}
+
+	.vs-ruch .vs-dojazd:not(.is-fala) .vs-pinezka__cialo {
+		opacity: 0;
+		translate: 0 -48px;
+	}
+
+	.vs-ruch .vs-dojazd:not(.is-fala) .vs-pinezka__punkt {
+		opacity: 0;
+		scale: 0.6;
+	}
+
+	.vs-ruch .vs-dojazd.is-fala .vs-pinezka__cialo {
+		animation: vs-dojazd-upadek 760ms 1250ms both;
+	}
+
+	.vs-ruch .vs-dojazd.is-fala .vs-pinezka__punkt {
+		animation: vs-dojazd-punkt 260ms var(--vs-ruch-wyjscie) 1720ms both;
+	}
+
+	.vs-ruch .vs-dojazd.is-fala .vs-pinezka__fala {
+		animation: vs-dojazd-fala 1400ms var(--vs-ruch-wyjscie) 1720ms 1 both;
+	}
+
+	/* Po sekwencji animacje zdjęte: późniejsze przeniesienie pinezki do znacznika mapy niczego nie powtarza. */
+	.vs-ruch .vs-dojazd.is-po-fali :is(.vs-pinezka__cialo, .vs-pinezka__punkt, .vs-pinezka__fala) {
+		animation: none;
+	}
+
+	/* Adres i ocena wjeżdżają z lewej (jak O mnie, ever.co.id: wiersze x -50 px); tytuł ma własne litery (vs_tytul). */
+	.vs-ruch .vs-dojazd__tresc [data-vs-wjazd]:not([data-vs-wjazd="tytul"], .is-widoczny) {
+		translate: -56px 0;
+	}
+}
+
+/* Upadek: spadanie z przyspieszeniem (grawitacja), odbicie 5 px z miękkim hamowaniem, osiadanie. */
+@keyframes vs-dojazd-upadek {
+	0% {
+		opacity: 0;
+		translate: 0 -48px;
+		animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+	}
+
+	14% {
+		opacity: 1;
+	}
+
+	62% {
+		translate: 0 0;
+		animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	80% {
+		translate: 0 -5px;
+		animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	100% {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes vs-dojazd-punkt {
+	from {
+		opacity: 0;
+		scale: 0.6;
+	}
+
+	to {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+@keyframes vs-dojazd-fala {
+	from {
+		opacity: 0.7;
+		scale: 1;
+	}
+
+	to {
+		opacity: 0;
+		scale: 3.2;
+	}
+}
+</style>
 <style id="visual-scale-kontakt-style-inline-css">
 /*
  * Kontakt (sekcja 10) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
@@ -2924,6 +3590,187 @@ if ( menu ) {
 }
 </script>
 <script type="module">/**
+ * Dojazd: mapa budowana dopiero przy zbliżeniu do sekcji i sekwencja ruchu „fala, potem pinezka”.
+ *
+ * Mapa: Leaflet (BSD-2) z assets/vendor i kafle OpenStreetMap (bez ciasteczek). Pinezka z HTML (link do trasy)
+ * przechodzi do znacznika Leafleta, więc jest jedna i nie mruga. Gdy Leaflet się nie wczyta, zostaje pinezka na beżu.
+ * Płynność (bramka plynnosc, telefon CPU x4): uruchomienie Leafleta (ok. 40 ms) i budowa mapy (ok. 50 ms) w jednej
+ * klatce przy przewijaniu dawały klatkę 110 ms. Dlatego skrypt wczytujemy w wolnej chwili po załadowaniu strony,
+ * a mapę budujemy przy zbliżeniu (600 px przed ekranem) w dwóch krokach. Duża mapa to ok. 30 ms na krok,
+ * więc każdy krok czeka, aż przewijanie stanie (160 ms bez ruchu), i dopiero wtedy idzie w wolnej chwili.
+ * Ruch (style.css, na dole): klasa is-fala rusza falę i upadek pinezki, gdy sekcja jest w połowie na ekranie
+ * i kafle mapy są wczytane (najpóźniej 3 s po wejściu, żeby pinezka zawsze się pojawiła); is-po-fali po końcu
+ * sekwencji zdejmuje animacje, więc późniejsze przeniesienie pinezki do mapy niczego nie powtarza.
+ * Gesty (mobile-native): na dotyku jeden palec przewija stronę, mapa powiększa się dwoma palcami;
+ * kółko myszy nie powiększa mapy.
+ */
+const sekcja = document.querySelector( '.vs-dojazd' );
+
+if ( sekcja && 'IntersectionObserver' in window ) {
+	const plotno = sekcja.querySelector( '[data-vs-mapa]' );
+	let widoczna = false;
+	let mapaGotowa = ! plotno;
+
+	const ruszaj = () => {
+		if ( sekcja.classList.contains( 'is-fala' ) ) {
+			return;
+		}
+		sekcja.classList.add( 'is-fala' );
+		setTimeout( () => sekcja.classList.add( 'is-po-fali' ), 3200 );
+	};
+	const sprobuj = () => widoczna && mapaGotowa && ruszaj();
+
+	const widok = new IntersectionObserver(
+		( wpisy ) => {
+			if ( wpisy.some( ( w ) => w.isIntersecting ) ) {
+				widok.disconnect();
+				widoczna = true;
+				sprobuj();
+				setTimeout( ruszaj, 3000 );
+			}
+		},
+		{ threshold: 0.5 }
+	);
+	widok.observe( sekcja.querySelector( '.vs-dojazd__mapa' ) || sekcja );
+
+	if ( plotno ) {
+		const poZaladowaniu = () => wolnaChwila( 3000 ).then( () => wczytajLeaflet( plotno ) ).catch( () => {} );
+		if ( document.readyState === 'complete' ) {
+			poZaladowaniu();
+		} else {
+			addEventListener( 'load', poZaladowaniu, { once: true } );
+		}
+
+		const obserwator = new IntersectionObserver(
+			( wpisy ) => {
+				if ( wpisy.some( ( w ) => w.isIntersecting ) ) {
+					obserwator.disconnect();
+					uruchomMape( plotno, () => {
+						mapaGotowa = true;
+						sprobuj();
+					} );
+				}
+			},
+			{ rootMargin: '600px 0px' }
+		);
+		obserwator.observe( plotno );
+	}
+}
+
+/** Przewijanie stoi od `cisza` ms (palec, kółko, płynny scroll): wtedy cięższa praca nie zabiera klatek ruchu. */
+function poPrzewijaniu( cisza = 160 ) {
+	return new Promise( ( gotowe ) => {
+		let zegar;
+		const ruch = () => {
+			clearTimeout( zegar );
+			zegar = setTimeout( () => {
+				removeEventListener( 'scroll', ruch );
+				gotowe();
+			}, cisza );
+		};
+		addEventListener( 'scroll', ruch, { passive: true } );
+		ruch();
+	} );
+}
+
+/** Wolna chwila przeglądarki (między klatkami), najpóźniej po `limit` ms. */
+function wolnaChwila( limit = 500 ) {
+	return new Promise( ( gotowe ) => ( 'requestIdleCallback' in window ? requestIdleCallback( () => gotowe(), { timeout: limit } ) : setTimeout( gotowe, 1 ) ) );
+}
+
+let leaflet = null;
+function wczytajLeaflet( plotno ) {
+	if ( window.L ) {
+		return Promise.resolve( window.L );
+	}
+	leaflet ??= new Promise( ( gotowe, blad ) => {
+		const arkusz = document.createElement( 'link' );
+		arkusz.rel = 'stylesheet';
+		arkusz.href = plotno.dataset.css;
+		document.head.append( arkusz );
+
+		const skrypt = document.createElement( 'script' );
+		skrypt.src = plotno.dataset.js;
+		skrypt.async = true;
+		skrypt.onload = () => ( window.L ? gotowe( window.L ) : blad( new Error( 'Brak Leaflet' ) ) );
+		skrypt.onerror = blad;
+		document.head.append( skrypt );
+	} );
+	return leaflet;
+}
+
+/**
+ * Buduje mapę; `gotowa()` woła, gdy kafle widocznego wycinka są wczytane (najpóźniej 1,5 s po dodaniu warstwy),
+ * albo od razu, gdy Leaflet się nie wczyta (pinezka zostaje na beżu i i tak spada).
+ */
+async function uruchomMape( plotno, gotowa ) {
+	let L;
+	try {
+		L = await wczytajLeaflet( plotno );
+	} catch {
+		gotowa();
+		return;
+	}
+
+	const punkt = [ Number( plotno.dataset.lat ), Number( plotno.dataset.lng ) ];
+	const dotyk = matchMedia( '(pointer: coarse)' ).matches;
+	const pinezka = plotno.querySelector( '.vs-pinezka' );
+
+	// Krok 1: mapa bez kafli, przyciski i pinezka.
+	await poPrzewijaniu();
+	await wolnaChwila();
+	const mapa = L.map( plotno, {
+		center: punkt,
+		zoom: Number( plotno.dataset.zoom ) || 16,
+		zoomSnap: 0.5,
+		scrollWheelZoom: false,
+		fadeAnimation: false,
+		dragging: ! dotyk,
+		zoomControl: false,
+		attributionControl: false,
+	} );
+
+	// Adres nie na środku mapy, tylko tam, gdzie wskazuje --vs-dojazd-punkt-x (na komputerze z dala od skosu przy treści).
+	const ustaw = () => {
+		const x = ( parseFloat( getComputedStyle( plotno ).getPropertyValue( '--vs-dojazd-punkt-x' ) ) || 50 ) / 100;
+		mapa.setView( punkt, mapa.getZoom(), { animate: false } );
+		mapa.panBy( [ ( 0.5 - x ) * plotno.clientWidth, 0 ], { animate: false } );
+	};
+	ustaw();
+	mapa.on( 'resize', ustaw );
+
+	// Przyciski +/−: na komputerze w prawym dolnym rogu, na telefonie w prawym górnym (przy dole jest przejście w tło,
+	// a nad nim podpis mapy, który inaczej wchodził na etykietę pinezki).
+	const komputer = matchMedia( '(min-width: 64rem)' ).matches;
+	L.control.zoom( { position: komputer ? 'bottomright' : 'topright', zoomInTitle: 'Przybliż mapę', zoomOutTitle: 'Oddal mapę' } ).addTo( mapa );
+	L.control.attribution( { prefix: false } ).addTo( mapa );
+	plotno.setAttribute( 'aria-label', 'Mapa dojazdu. Strzałki przesuwają mapę, plus i minus ją powiększają.' );
+
+	if ( pinezka ) {
+		// Kliknięcie w pinezkę to link do trasy, nie początek przeciągania mapy.
+		L.DomEvent.disableClickPropagation( pinezka );
+		L.marker( punkt, {
+			icon: L.divIcon( { html: pinezka, className: 'vs-pinezka-ikona', iconSize: null, iconAnchor: [ 0, 0 ] } ),
+			keyboard: false,
+			interactive: false,
+		} ).addTo( mapa );
+	}
+
+	// Krok 2: kafle.
+	await poPrzewijaniu();
+	await wolnaChwila();
+	const kafle = L.tileLayer( 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	} );
+	kafle.once( 'load', gotowa );
+	setTimeout( gotowa, 1500 );
+	kafle.addTo( mapa );
+
+	plotno.classList.add( 'is-gotowa' );
+}
+</script>
+<script type="module">/**
  * Prośba o termin bez zbierania danych (struktura 1.2): z pól formularza składamy wiadomość i otwieramy
  * SMS (telefon, dotyk) albo WhatsApp (komputer, mysz) z gotowym tekstem. Wysyła ją klientka ze swojego urządzenia.
  * Szablony zdań z danych klientki (kontakt.prosba): {imie} i {zabieg} podmieniamy na wartości z pól.
@@ -3394,6 +4241,59 @@ if ( czekajace.size ) {
 					Zadzwoń 111 111 111				</a>
 					</div>
 	</div>
+</section>
+
+
+<section class="vs-dojazd wp-block-visual-scale-dojazd" id="dojazd" aria-labelledby="vs-dojazd-tytul">
+			<figure class="vs-dojazd__mapa" data-vs-wjazd>
+			<div
+				class="vs-dojazd__plotno"
+				data-vs-mapa
+				data-lat="50.259"
+				data-lng="19.0222"
+				data-zoom="15"
+				data-js="assets/leaflet.js"
+				data-css="assets/leaflet.css"
+			>
+				<a
+					class="vs-pinezka"
+					href="https://www.google.com/maps/dir/?api=1&#038;destination=50.259%2C19.0222"
+					target="_blank"
+					rel="noopener"
+					aria-label="Beauty Studio, ul. Przykładowa 11, Katowice. Wyznacz trasę w Google Maps (otwiera się w nowym oknie)"
+				>
+					<span class="vs-pinezka__cialo">
+													<span class="vs-pinezka__awatar">
+								<img width="192" height="192" src="media/awatar.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />							</span>
+												<span class="vs-pinezka__znak">
+							<span class="vs-wordmark"><span class="vs-wordmark__glowna">Beauty</span> <span class="vs-wordmark__dopisek">Studio</span></span>							<span class="vs-pinezka__trasa">Wyznacz trasę <span class="vs-strzalka" aria-hidden="true">→</span></span>
+						</span>
+						<span class="vs-pinezka__ogon" aria-hidden="true"></span>
+					</span>
+					<span class="vs-pinezka__punkt" aria-hidden="true"><span class="vs-pinezka__fala"></span></span>
+				</a>
+			</div>
+			<figcaption class="vs-ukryte">
+				Mapa dojazdu: Beauty Studio, ul. Przykładowa 11, Katowice			</figcaption>
+		</figure>
+	
+	<div class="vs-dojazd__tresc">
+		<h2 class="vs-tytul vs-dojazd__tytul" id="vs-dojazd-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-dojazd__tytul-glowna"><span class="vs-ukryte">Zapraszam</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">Z</span><span class="vs-litera" style="--i: 1">a</span><span class="vs-litera" style="--i: 2">p</span><span class="vs-litera" style="--i: 3">r</span><span class="vs-litera" style="--i: 4">a</span><span class="vs-litera" style="--i: 5">s</span><span class="vs-litera" style="--i: 6">z</span><span class="vs-litera" style="--i: 7">a</span><span class="vs-litera" style="--i: 8">m</span></span></span></span></span> <span class="vs-tytul__dopisek vs-dojazd__tytul-dopisek">do studia</span></h2>
+		
+		<div class="vs-dojazd__adres-blok" data-vs-wjazd>
+			<address class="vs-dojazd__adres">
+									<span class="vs-dojazd__ulica">ul. Przykładowa 11</span>
+								<span>Katowice, Śródmieście</span>
+			</address>
+						<a class="vs-przycisk vs-dojazd__trasa" href="https://www.google.com/maps/dir/?api=1&#038;destination=50.259%2C19.0222" target="_blank" rel="noopener">
+				<svg class="vs-dojazd__ikona" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M21 3 3 10.5l7.5 3L13.5 21 21 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+				Wyznacz trasę				<span class="vs-ukryte">(otwiera się w nowym oknie)</span>
+			</a>
+		</div>
+
+					<div class="vs-dojazd__opinie" data-vs-wjazd>
+				<a class="vs-dojazd__ocena" href="#opinie"><span class="vs-dojazd__ocena-wynik"><span class="vs-dojazd__ocena-liczba">5,0</span><span class="vs-dojazd__ocena-gwiazdki"><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 0" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 3" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 4" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span></span><span class="vs-dojazd__ocena-opis"><span class="vs-dojazd__ocena-zrodlo"><svg class="vs-dojazd__ocena-znak" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 16" fill="currentColor" fill-rule="evenodd"><title>Booksy</title><path d="M68.72 3.921q.343-.001.685 0c.616.006.667.078.443.628q-.552 1.359-1.107 2.715l-2.506 6.103c-.193.47-.413.925-.704 1.343-.592.848-1.38 1.301-2.446 1.29a4.8 4.8 0 0 1-1.747-.325c-.357-.141-.518-.234-.297-.656.089-.17.145-.355.226-.53.213-.464.235-.467.708-.297.214.076.434.152.657.184.696.1 1.228-.143 1.602-.755.245-.402.318-.745.096-1.213-1.195-2.525-2.35-5.069-3.517-7.607-.072-.158-.147-.317-.207-.48-.089-.242-.018-.368.238-.391.227-.02.457-.004.686-.004 1.04.003.818-.105 1.216.792.799 1.797 1.582 3.6 2.377 5.398l.165.336s.052.108.117.108.161.01.235-.121c.029-.051.06-.127.09-.2a1 1 0 0 1 .024-.084c.755-1.915 1.494-3.836 2.242-5.754.187-.48.194-.478.723-.48M55.884 7.478c.63.219 1.282.364 1.898.622.491.205.948.455 1.323.838.907.927.741 2.66-.227 3.548-.604.552-1.327.831-2.143.884-1.322.086-2.543-.226-3.67-.907-.795-.48-.81-.526-.276-1.245.362-.486.315-.705 1.061-.2.85.575 1.8.853 2.843.764.382-.033.723-.147.99-.427.44-.462.38-1.072-.141-1.444-.363-.259-.792-.371-1.208-.506-.383-.125-.775-.222-1.16-.34a6 6 0 0 1-1.157-.502c-1.567-.868-1.482-2.765-.54-3.769.578-.616 1.302-.93 2.143-.984.175-.011.352-.002.527-.002 1.087-.039 2.074.3 3.007.818.384.215.407.325.185.71-.122.213-.255.418-.382.627-.122.202-.292.236-.496.14a5 5 0 0 1-.326-.172 4.7 4.7 0 0 0-1.95-.589 1.9 1.9 0 0 0-1.161.265c-.603.372-.62 1.044-.044 1.453.276.196.588.309.904.418m-8.277.24c-.242.254-.245.274-.02.57 1.082 1.42 2.168 2.835 3.25 4.255.121.159.35.299.238.535-.108.23-.357.177-.565.178-.281.003-.564-.014-.844.005-.312.021-.526-.09-.716-.34-.75-.99-1.516-1.97-2.279-2.95-.616-.79-.523-.745-1.005-.303-.322.318-.727.73-.877.943q-.092.165-.15.344c-.085.329-.056.672-.056.672v.44c.017.185.009.374 0 .563l-.008.174c-.014.333-.114.437-.444.45q-.475.018-.95 0c-.354-.015-.412-.077-.415-.453-.006-.89-.002-1.78-.002-2.67V1.02c0-.14.004-.279.002-.418-.005-.218.115-.33.318-.336.369-.012.739-.018 1.108-.002.26.011.36.13.382.401.01.122.003.245.003.367 0 2.251-.002 4.503.006 6.754v.429q.029.052.107.08c.162.055.28-.176.397-.297a630 630 0 0 0 3.64-3.787c.196-.207.397-.312.688-.295.385.021.773.007 1.16.005.165 0 .327.013.402.185.074.171-.08.252-.172.346-.674.688-1.354 1.37-2.029 2.058q-.589.6-1.169 1.208m-16.342.858c.005-2.586 1.936-4.84 4.888-4.841C39.233 3.733 41.108 6.22 41 8.594c.066 2.29-1.656 4.832-4.878 4.842-2.954.009-4.861-2.23-4.856-4.86m7.923.054c.083-1.534-1.203-3.4-3.282-3.237-1.054.083-1.835.566-2.355 1.448a3.3 3.3 0 0 0-.359 2.573c.53 2.06 2.684 2.93 4.379 2.018 1.108-.596 1.57-1.59 1.617-2.802m-19.24-.046c.002-2.422 1.835-4.853 4.882-4.85 3.029.001 4.904 2.371 4.865 4.852.013 2.547-1.883 4.87-4.933 4.85-3.023-.02-4.816-2.394-4.814-4.852m7.118 2.215a3.36 3.36 0 0 0 .299-3.996c-.59-.92-1.424-1.421-2.7-1.411-.623-.035-1.283.23-1.861.744-1.268 1.127-1.4 3.27-.246 4.6a2.986 2.986 0 0 0 4.508.063M11.554 4.137c.715-.42 1.51-.645 2.313-.611 1.708.07 3.056.842 3.948 2.32.53.877.713 1.833.7 2.853-.015 1.146-.343 2.166-1.083 3.04-.93 1.098-2.131 1.629-3.576 1.75-2.131.179-3.862-.689-5.488-1.897a40 40 0 0 0-2.456-1.719 4.3 4.3 0 0 0-1.198-.529c-.962-.253-1.886.113-2.405.953-.046.075-.095.149-.13.228-.104.239-.282.334-.543.325-.386-.012-.774.005-1.16-.005-.46-.013-.574-.176-.395-.594.606-1.416 1.675-2.308 3.179-2.652 1.395-.32 2.685-.039 3.84.805.68.496 1.34 1.02 2.027 1.504.933.658 1.892 1.294 3.005 1.6 1.175.325 2.33.283 3.372-.462.612-.439 1.015-1.017 1.131-1.76.155-.995.05-1.945-.58-2.787-1.186-1.586-3.502-1.51-4.582.169-.308.478-.5.996-.47 1.58.014.243.017.49-.007.732-.028.284-.193.392-.43.269a8 8 0 0 1-1.23-.807c-.194-.149-.159-.373-.159-.581q0-1.807.002-3.613c0-1.204-.003-2.409 0-3.613.002-.551.036-.58.61-.587h.527c.6.007.688.096.69.711q.002 1.205 0 2.409v.628c.002.651.007.66.548.341"/></svg></span><span class="vs-dojazd__ocena-tekst">Średnia z 64 opinii</span></span><span class="vs-ukryte">, ocena na 5</span></a>			</div>
+			</div>
 </section>
 
 

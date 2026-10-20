@@ -659,7 +659,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	.vs-hero__podpis {
 		position: static;
-		max-width: 30ch;
+		max-width: 100%;
 		letter-spacing: 0.2em;
 		line-height: 1.6;
 		text-wrap: balance;
@@ -668,6 +668,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 
 	.vs-hero__podpis::before {
+		display: none;
+	}
+
+	/* Zabiegi i miasto w osobnych wierszach, bez kropki (kropka na początku wiersza wyglądała na błąd). */
+	.vs-hero__czesc {
+		display: block;
+	}
+
+	.vs-hero__kropka {
 		display: none;
 	}
 
@@ -3141,7 +3150,11 @@ if ( czekajace.size ) {
 						<img width="2560" height="1440" src="media/hero.webp" class="vs-hero__img" alt="Marta Majewska w kremowym garniturze na bordowym tle" loading="eager" fetchpriority="high" decoding="async" />		</picture>
 	
 	<h1 class="vs-hero__tytul" id="vs-hero-tytul">
-		<span class="vs-wordmark"><span class="vs-wordmark__glowna"><span class="vs-ukryte">Beauty</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">B</span><span class="vs-litera" style="--i: 1">e</span><span class="vs-litera" style="--i: 2">a</span><span class="vs-litera" style="--i: 3">u</span><span class="vs-litera" style="--i: 4">t</span><span class="vs-litera" style="--i: 5">y</span></span></span></span> <span class="vs-wordmark__dopisek"><span class="vs-ukryte">Studio</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 6">S</span><span class="vs-litera" style="--i: 7">t</span><span class="vs-litera" style="--i: 8">u</span><span class="vs-litera" style="--i: 9">d</span><span class="vs-litera" style="--i: 10">i</span><span class="vs-litera" style="--i: 11">o</span></span></span></span></span>					<span class="vs-hero__podpis">Makijaż ślubny i wieczorowy · Miasto</span>
+		<span class="vs-wordmark"><span class="vs-wordmark__glowna"><span class="vs-ukryte">Beauty</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">B</span><span class="vs-litera" style="--i: 1">e</span><span class="vs-litera" style="--i: 2">a</span><span class="vs-litera" style="--i: 3">u</span><span class="vs-litera" style="--i: 4">t</span><span class="vs-litera" style="--i: 5">y</span></span></span></span> <span class="vs-wordmark__dopisek"><span class="vs-ukryte">Studio</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 6">S</span><span class="vs-litera" style="--i: 7">t</span><span class="vs-litera" style="--i: 8">u</span><span class="vs-litera" style="--i: 9">d</span><span class="vs-litera" style="--i: 10">i</span><span class="vs-litera" style="--i: 11">o</span></span></span></span></span>					<span class="vs-hero__podpis"><span class="vs-hero__podpis-tekst">
+														<span class="vs-hero__czesc">Makijaż ślubny i wieczorowy</span>
+															<span class="vs-hero__kropka" aria-hidden="true">·</span>
+										<span class="vs-hero__czesc">Miasto</span>
+							</span></span>
 			</h1>
 
 	<a class="vs-przycisk vs-hero__rezerwacja" href="#kontakt">

@@ -2338,12 +2338,46 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	pointer-events: none;
 }
 
-/* Telefon i tablet: podpis OpenStreetMap nad przejściem w tło (musi być czytelny); przyciski +/− w prawym górnym rogu (view.js). */
-@media (max-width: 63.99rem) {
-	.vs-dojazd .leaflet-bottom {
-		bottom: var(--vs-dojazd-zanik);
-	}
+/*
+ * Gotowy obraz mapy (narzedzia/mapa.mjs), widoczny od razu: punkt adresu na obrazie (telefon: środek 550, 350
+ * z 1100 x 700; komputer: 1500, 550 z 2400 x 1100) stoi dokładnie tam, gdzie adres na stronie (--vs-dojazd-punkt-x,
+ * połowa wysokości), więc żywa mapa wczytuje się na nim niewidocznie. Gdy jest gotowa (is-zywa), obraz znika.
+ */
+.vs-dojazd__obraz img {
+	position: absolute;
+	top: calc(50% - 350px);
+	left: calc(var(--vs-dojazd-punkt-x) - 550px);
+	display: block;
+	width: 1100px;
+	max-width: none;
+	height: 700px;
+	pointer-events: none;
+	transition: opacity 300ms ease;
 }
+
+.vs-dojazd__plotno.is-zywa .vs-dojazd__obraz img {
+	opacity: 0;
+}
+
+/* Podpis OpenStreetMap (wymagany): nasz element, widoczny od razu (przy obrazie i przy żywej mapie). */
+.vs-dojazd__osm {
+	position: absolute;
+	right: 0;
+	bottom: var(--vs-dojazd-zanik);
+	z-index: 2;
+	margin: 0;
+	padding: 2px 8px;
+	background: color-mix(in srgb, var(--vs-jasne) 88%, transparent);
+	color: var(--vs-na-jasnym);
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.vs-dojazd__osm a {
+	color: inherit;
+	text-decoration: underline;
+}
+
 
 @media (min-width: 40rem) and (max-width: 63.99rem) {
 	.vs-dojazd__plotno {
@@ -2386,6 +2420,22 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	.vs-dojazd__mapa::after {
 		display: none;
+	}
+
+	.vs-dojazd__obraz img {
+		top: calc(50% - 550px);
+		left: calc(var(--vs-dojazd-punkt-x) - 1500px);
+		width: 2400px;
+		height: 1100px;
+	}
+
+	.vs-dojazd__osm {
+		bottom: 0;
+	}
+
+	/* Przyciski +/− nad podpisem OpenStreetMap. */
+	.vs-dojazd .leaflet-bottom {
+		bottom: 22px;
 	}
 
 	/*
@@ -2658,19 +2708,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		background: var(--vs-ciemne);
 		color: var(--vs-na-ciemnym);
 	}
-}
-
-.vs-dojazd .leaflet-container .leaflet-control-attribution {
-	padding: 2px 8px;
-	background: color-mix(in srgb, var(--vs-jasne) 88%, transparent);
-	color: var(--vs-na-jasnym);
-	font-size: 11px;
-	line-height: 1.5;
-}
-
-.vs-dojazd .leaflet-container .leaflet-control-attribution a {
-	color: inherit;
-	text-decoration: underline;
 }
 
 /*
@@ -3590,17 +3627,20 @@ if ( menu ) {
 }
 </script>
 <script type="module">/**
- * Dojazd: mapa budowana dopiero przy zbliżeniu do sekcji i sekwencja ruchu „fala, potem pinezka”.
+ * Dojazd: mapa od razu (gotowy obraz), sekwencja ruchu „fala, potem pinezka” i żywa mapa po niej.
  *
- * Mapa: Leaflet (BSD-2) z assets/vendor i kafle OpenStreetMap (bez ciasteczek). Pinezka z HTML (link do trasy)
- * przechodzi do znacznika Leafleta, więc jest jedna i nie mruga. Gdy Leaflet się nie wczyta, zostaje pinezka na beżu.
- * Płynność (bramka plynnosc, telefon CPU x4): uruchomienie Leafleta (ok. 40 ms) i budowa mapy (ok. 50 ms) w jednej
- * klatce przy przewijaniu dawały klatkę 110 ms. Dlatego skrypt wczytujemy w wolnej chwili po załadowaniu strony,
- * a mapę budujemy przy zbliżeniu (600 px przed ekranem) w dwóch krokach. Duża mapa to ok. 30 ms na krok,
- * więc każdy krok czeka, aż przewijanie stanie (160 ms bez ruchu), i dopiero wtedy idzie w wolnej chwili.
- * Ruch (style.css, na dole): klasa is-fala rusza falę i upadek pinezki, gdy sekcja jest w połowie na ekranie
- * i kafle mapy są wczytane (najpóźniej 3 s po wejściu, żeby pinezka zawsze się pojawiła); is-po-fali po końcu
- * sekwencji zdejmuje animacje, więc późniejsze przeniesienie pinezki do mapy niczego nie powtarza.
+ * Szybkość (Igor, 20.10.2026: „mapka się bardzo wolno wczytuje … żeby to wczytywało się diametralnie od razu”):
+ * kafle z tile.openstreetmap.org dla naszej okolicy nie leżą w pamięci ich serwera (0,3 do 1,5 s na kafel).
+ * Dlatego sekcja pokazuje gotowy obraz tej samej mapy (narzedzia/mapa.mjs, plik z naszego serwera). Pobieramy go
+ * z wyprzedzeniem (ok. 2000 px przed sekcją), więc fala i pinezka ruszają, gdy tylko sekcja wejdzie na ekran.
+ * Żywa mapa (Leaflet, BSD-2, z assets/vendor; kafle OpenStreetMap bez ciasteczek) buduje się po sekwencji, na tym
+ * samym obrazie, i zastępuje go (is-zywa), gdy jej kafle są wczytane albo gdy ktoś zacznie ją przesuwać.
+ * Bez obrazu w danych: dawny tryb (mapa przy zbliżeniu, fala po wczytaniu kafli, najpóźniej po 3 s).
+ * Płynność (bramka plynnosc, telefon CPU x4): uruchomienie Leafleta (ok. 40 ms) i budowa mapy (ok. 30 ms na krok)
+ * w klatce przewijania zacinały. Dlatego skrypt wczytujemy w wolnej chwili po załadowaniu strony, a każdy krok
+ * budowy czeka, aż przewijanie stanie (160 ms bez ruchu), i idzie w wolnej chwili.
+ * Ruch (style.css, na dole): is-fala rusza falę i upadek pinezki; is-po-fali po końcu sekwencji zdejmuje animacje,
+ * więc późniejsze przeniesienie pinezki do znacznika żywej mapy niczego nie powtarza.
  * Gesty (mobile-native): na dotyku jeden palec przewija stronę, mapa powiększa się dwoma palcami;
  * kółko myszy nie powiększa mapy.
  */
@@ -3608,15 +3648,27 @@ const sekcja = document.querySelector( '.vs-dojazd' );
 
 if ( sekcja && 'IntersectionObserver' in window ) {
 	const plotno = sekcja.querySelector( '[data-vs-mapa]' );
+	const obraz = sekcja.querySelector( '.vs-dojazd__obraz img' );
 	let widoczna = false;
 	let mapaGotowa = ! plotno;
 
+	const zywaMapa = () => {
+		if ( plotno && ! plotno.dataset.vsStart ) {
+			plotno.dataset.vsStart = '1';
+			uruchomMape( plotno, () => plotno.classList.add( 'is-zywa' ) );
+		}
+	};
 	const ruszaj = () => {
 		if ( sekcja.classList.contains( 'is-fala' ) ) {
 			return;
 		}
 		sekcja.classList.add( 'is-fala' );
-		setTimeout( () => sekcja.classList.add( 'is-po-fali' ), 3200 );
+		setTimeout( () => {
+			sekcja.classList.add( 'is-po-fali' );
+			if ( obraz ) {
+				zywaMapa();
+			}
+		}, 3200 );
 	};
 	const sprobuj = () => widoczna && mapaGotowa && ruszaj();
 
@@ -3640,15 +3692,42 @@ if ( sekcja && 'IntersectionObserver' in window ) {
 		} else {
 			addEventListener( 'load', poZaladowaniu, { once: true } );
 		}
+	}
 
+	if ( obraz ) {
+		// Obraz mapy: pobranie z wyprzedzeniem, fala rusza, gdy jest zdekodowany (bez czekania na kafle).
+		const wyprzedzenie = new IntersectionObserver(
+			( wpisy ) => {
+				if ( wpisy.some( ( w ) => w.isIntersecting ) ) {
+					wyprzedzenie.disconnect();
+					obraz.loading = 'eager';
+				}
+			},
+			{ rootMargin: '2000px 0px' }
+		);
+		wyprzedzenie.observe( sekcja );
+		const gotowy = () => {
+			mapaGotowa = true;
+			sprobuj();
+		};
+		const wczytany = obraz.complete && obraz.naturalWidth
+			? Promise.resolve()
+			: new Promise( ( ok, blad ) => {
+				obraz.addEventListener( 'load', ok, { once: true } );
+				obraz.addEventListener( 'error', blad, { once: true } );
+			} );
+		wczytany.then( () => obraz.decode() ).then( gotowy, gotowy );
+	} else if ( plotno ) {
+		// Bez obrazu: mapa przy zbliżeniu, fala po wczytaniu kafli.
 		const obserwator = new IntersectionObserver(
 			( wpisy ) => {
 				if ( wpisy.some( ( w ) => w.isIntersecting ) ) {
 					obserwator.disconnect();
+					plotno.dataset.vsStart = '1';
 					uruchomMape( plotno, () => {
 						mapaGotowa = true;
 						sprobuj();
-					} );
+					}, 1500 );
 				}
 			},
 			{ rootMargin: '600px 0px' }
@@ -3700,10 +3779,11 @@ function wczytajLeaflet( plotno ) {
 }
 
 /**
- * Buduje mapę; `gotowa()` woła, gdy kafle widocznego wycinka są wczytane (najpóźniej 1,5 s po dodaniu warstwy),
- * albo od razu, gdy Leaflet się nie wczyta (pinezka zostaje na beżu i i tak spada).
+ * Buduje żywą mapę; `gotowa()` woła, gdy kafle widocznego wycinka są wczytane albo gdy ktoś zacznie przesuwać
+ * lub powiększać mapę (wtedy obraz pod spodem już nie pasuje); z `zapas` (ms) najpóźniej po tym czasie od dodania
+ * warstwy. Gdy Leaflet się nie wczyta, woła od razu (zostaje obraz albo beż z pinezką).
  */
-async function uruchomMape( plotno, gotowa ) {
+async function uruchomMape( plotno, gotowa, zapas = 0 ) {
 	let L;
 	try {
 		L = await wczytajLeaflet( plotno );
@@ -3727,6 +3807,7 @@ async function uruchomMape( plotno, gotowa ) {
 		fadeAnimation: false,
 		dragging: ! dotyk,
 		zoomControl: false,
+		// Podpis „© OpenStreetMap” jest w HTML sekcji (widoczny od razu, także przy gotowym obrazie).
 		attributionControl: false,
 	} );
 
@@ -3743,7 +3824,6 @@ async function uruchomMape( plotno, gotowa ) {
 	// a nad nim podpis mapy, który inaczej wchodził na etykietę pinezki).
 	const komputer = matchMedia( '(min-width: 64rem)' ).matches;
 	L.control.zoom( { position: komputer ? 'bottomright' : 'topright', zoomInTitle: 'Przybliż mapę', zoomOutTitle: 'Oddal mapę' } ).addTo( mapa );
-	L.control.attribution( { prefix: false } ).addTo( mapa );
 	plotno.setAttribute( 'aria-label', 'Mapa dojazdu. Strzałki przesuwają mapę, plus i minus ją powiększają.' );
 
 	if ( pinezka ) {
@@ -3759,12 +3839,12 @@ async function uruchomMape( plotno, gotowa ) {
 	// Krok 2: kafle.
 	await poPrzewijaniu();
 	await wolnaChwila();
-	const kafle = L.tileLayer( 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-	} );
+	const kafle = L.tileLayer( 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 } );
 	kafle.once( 'load', gotowa );
-	setTimeout( gotowa, 1500 );
+	mapa.once( 'movestart zoomstart', gotowa );
+	if ( zapas ) {
+		setTimeout( gotowa, zapas );
+	}
 	kafle.addTo( mapa );
 
 	plotno.classList.add( 'is-gotowa' );
@@ -4255,7 +4335,11 @@ if ( czekajace.size ) {
 				data-js="assets/leaflet.js"
 				data-css="assets/leaflet.css"
 			>
-				<a
+									<picture class="vs-dojazd__obraz">
+													<source media="(max-width: 63.99rem)" srcset="media/mapa-telefon.webp" width="1100" height="700">
+												<img src="media/mapa.webp" alt="" width="2400" height="1100" loading="lazy" decoding="async">
+					</picture>
+								<a
 					class="vs-pinezka"
 					href="https://www.google.com/maps/dir/?api=1&#038;destination=50.259%2C19.0222"
 					target="_blank"
@@ -4273,6 +4357,7 @@ if ( czekajace.size ) {
 					<span class="vs-pinezka__punkt" aria-hidden="true"><span class="vs-pinezka__fala"></span></span>
 				</a>
 			</div>
+			<p class="vs-dojazd__osm">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
 			<figcaption class="vs-ukryte">
 				Mapa dojazdu: Beauty Studio, ul. Przykładowa 11, Katowice			</figcaption>
 		</figure>

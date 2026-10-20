@@ -821,9 +821,80 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		scale: 1.12;
 	}
 }
-</style>
-<style id="visual-scale-efekty-style-inline-css">
+
 /*
+ * Litery logo (vs_logo( true ), wzory lecharme.beauty i ever.co.id, pomiar 20.10.2026).
+ * Wejście: każda litera wysuwa się po kolei co 45 ms (transform), a całe słowo dalej wchodzi jak wyżej.
+ * Odjazd przy przewijaniu: litery odlatują w górę po kolei od lewej, każda następna szybciej (--i z vs_litery, „Studio”
+ * liczy dalej po „BEAUTY”), więc napis rozjeżdża się w równą rampę, a nie w bałagan, i gaśnie, zanim następna
+ * sekcja zakryje środek ekranu (u Le Charme litery logo zjeżdżają na osi przewijania, każda w innym tempie).
+ * Podpis i ocena gasną wcześniej. Oś przewijania strony (CSS, wątek grafiki); wejście ma pierwszeństwo, dopóki trwa.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	.vs-hero .vs-litera {
+		animation: vs-hero-litera 1100ms var(--vs-ruch-wyjscie) both;
+		animation-delay: calc(150ms + var(--i, 0) * 45ms);
+	}
+
+}
+
+@keyframes vs-hero-litera {
+	from {
+		transform: translateY(0.45em);
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-hero .vs-litera {
+			animation-name: vs-hero-litera, vs-hero-odjazd-litery;
+			animation-duration: 1100ms, auto;
+			animation-timing-function: var(--vs-ruch-wyjscie), linear;
+			animation-fill-mode: both;
+			animation-delay: calc(150ms + var(--i, 0) * 45ms), 0s;
+			animation-timeline: auto, scroll(root);
+			animation-range: normal, 0 62svh;
+		}
+
+		/* Odjazd pierwszy na liście: wejście (późniejsze) wygrywa, dopóki trwa, potem rządzi przewijanie. */
+		.vs-hero__podpis,
+		.vs-hero__ocena {
+			animation-name: vs-hero-odjazd, vs-hero-wejscie;
+			animation-duration: auto, 1000ms;
+			animation-timing-function: linear, var(--vs-ruch-wyjscie);
+			animation-fill-mode: both, backwards;
+			animation-timeline: scroll(root), auto;
+			animation-range: 0 38svh, normal;
+		}
+
+		.vs-hero__podpis {
+			animation-delay: 0s, 450ms;
+		}
+
+		.vs-hero__ocena {
+			animation-delay: 0s, 650ms;
+		}
+	}
+}
+
+@keyframes vs-hero-odjazd-litery {
+	35% {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+		translate: 0 calc(-8svh - var(--i, 0) * 2.6svh);
+	}
+}
+
+@keyframes vs-hero-odjazd {
+	to {
+		opacity: 0;
+		translate: 0 24px;
+	}
+}
+</style>
+<style>/*
  * Efekty: „Moje prace” Adriana (szablon 3). Para zdjęć w złotym podziale: duże : małe = 1,618 : 1,
  * w drugim rzędzie odwrotnie. Siatka 1fr 0,618fr 1fr daje obie pary w jednym układzie.
  * Zdjęcie wjeżdża czarno-białe (jak u Adriana) i samo „wywołuje się” w kolorze, raz, na każdym ekranie.
@@ -1080,7 +1151,72 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
+/*
+ * Odsłona od środka (wzór ever.co.id, pomiar 20.10.2026: zdjęcia otwierają się z pionowej kreski na środku,
+ * clip-path inset(0 50% 0 50%) do pełnej ramki). U nas dwie zasłony w kolorze tła sekcji rozsuwają się na boki
+ * (tylko scale, wątek grafiki), a zdjęcie w środku oddala się z 1,3 do 1. Wszystko na osi przewijania kafla:
+ * kafel otwiera się pod palcem, w tempie przewijania, i zamyka, gdy wracamy w górę. Kafle w rzędzie startują
+ * z różnych miejsc (co drugi później), więc para nie otwiera się jak jeden blok.
+ * Wspólny wjazd kafla (opacity) przestaje być potrzebny; „wywołanie” koloru zostaje.
+ */
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-ruch .vs-efekty__kafel[data-vs-wjazd] {
+			opacity: 1;
+			translate: none;
+		}
 
+		.vs-efekty__kafel::before,
+		.vs-efekty__kafel::after {
+			content: "";
+			position: absolute;
+			/* Zapas 2 px poza kafel (przycina go overflow): krawędź zasłony nigdy nie zostawia włosowej linii tła. */
+			inset-block: -2px;
+			z-index: 1;
+			width: calc(50% + 3px);
+			background: var(--vs-jasne);
+			pointer-events: none;
+			animation: vs-efekty-zaslona linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-kafel;
+			animation-range: entry 5% cover 42%;
+		}
+
+		.vs-efekty__kafel::before {
+			left: -2px;
+			transform-origin: 0 50%;
+		}
+
+		.vs-efekty__kafel::after {
+			right: -2px;
+			transform-origin: 100% 50%;
+		}
+
+		.vs-efekty__zdjecie img {
+			animation: vs-efekty-oddalenie linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-kafel;
+			animation-range: entry 0% cover 55%;
+		}
+
+		.vs-efekty__kafel:nth-child(even)::before,
+		.vs-efekty__kafel:nth-child(even)::after {
+			animation-range: entry 30% cover 50%;
+		}
+	}
+}
+
+@keyframes vs-efekty-zaslona {
+	to {
+		scale: 0 1;
+	}
+}
+
+@keyframes vs-efekty-oddalenie {
+	from {
+		scale: 1.3;
+	}
+}
 </style>
 <style id="visual-scale-cennik-style-inline-css">
 /*
@@ -1273,8 +1409,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Ruch cennika (plan ruchu Igora 20.10.2026, scroll-craft: cisza przed szczytem w Haśle): prawie nic. Linia nad grupą
- * rysuje się od lewej, wiersze z cenami wchodzą po kolei co 70 ms. Nic nie przeszkadza w czytaniu cen;
+ * Ruch cennika (plan ruchu Igora 20.10.2026, scroll-craft: spokojniej przed szczytem w Haśle): litery nagłówka wysuwają się
+ * po kolei (vs_tytul), linia nad grupą rysuje się od lewej, wiersze z cenami wjeżdżają z lewej po kolei co 80 ms
+ * (ever.co.id: wiersze x -50 px). Nic nie przeszkadza w czytaniu cen;
  * ukrycie bez przejścia, przejście tylko przy pojawieniu (jak wspólny wjazd).
  */
 .vs-ruch .vs-cennik__kategoria:not(.is-widoczny) .vs-cennik__uslugi::before {
@@ -1287,14 +1424,14 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 .vs-ruch .vs-cennik__kategoria:not(.is-widoczny) .vs-cennik__usluga {
 	opacity: 0;
-	translate: 0 10px;
+	translate: -40px 0;
 }
 
 .vs-ruch .vs-cennik__kategoria.is-widoczny .vs-cennik__usluga {
 	transition:
-		opacity 600ms var(--vs-ruch-wyjscie),
-		translate 600ms var(--vs-ruch-wyjscie);
-	transition-delay: calc(var(--vs-opoznienie, 0ms) + 300ms + var(--i, 0) * 70ms);
+		opacity 800ms var(--vs-ruch-wyjscie),
+		translate 800ms var(--vs-ruch-wyjscie);
+	transition-delay: calc(var(--vs-opoznienie, 0ms) + 300ms + var(--i, 0) * 80ms);
 }
 
 .vs-cennik__usluga:nth-child(2) { --i: 1; }
@@ -1583,9 +1720,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Paralaksa portretu (plan ruchu Igora 20.10.2026): wycięta postać jedzie wolniej niż tekst i dochodzi na swoje miejsce,
- * gdy sekcja jest na środku ekranu (od 72 px niżej do 0). Ruch w dół, więc ucięcie zdjęcia nigdy nie wychodzi nad krawędź;
- * ramka przycina. Oś widoku sekcji (CSS, wątek grafiki); bez niej albo przy ograniczonym ruchu portret stoi.
+ * Portret wyjeżdża z ramki (plan ruchu Igora 20.10.2026, mocniej po „nie ma fajnych efektów”): wycięta postać wstaje
+ * spod dolnej krawędzi (od 32% swojej wysokości niżej do 0) i dochodzi na miejsce, gdy sekcja jest na środku ekranu.
+ * Ruch w dół, więc ucięcie zdjęcia nigdy nie wychodzi nad krawędź; ramka przycina. Tekst obok wjeżdża z lewej. Oś widoku sekcji (CSS, wątek grafiki); bez niej albo przy ograniczonym ruchu portret stoi.
  */
 .vs-o-mnie__portret {
 	overflow: clip;
@@ -1608,13 +1745,18 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 @keyframes vs-o-mnie-portret {
 	from {
-		translate: 0 72px;
+		translate: 0 32%;
 	}
 	to {
 		translate: 0 0;
 	}
 }
 
+
+/* Imię, akapity i szkolenia wjeżdżają z lewej (ever.co.id: wiersze x -50 px), po kolei co 120 ms (wspólny wjazd). */
+.vs-ruch .vs-o-mnie__tresc [data-vs-wjazd]:not(.is-widoczny) {
+	translate: -56px 0;
+}
 
 
 </style>
@@ -1625,7 +1767,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
  * Karta zależy od własnej szerokości (container query, better-layout): wąska = zdjęcie 88 px obok imienia, treść pod spodem;
  * szeroka = zdjęcie po lewej, imię i treść obok. Komputer: karty obok siebie; telefon: jedna pod drugą.
  * Szerokość i nagłówek jak w cenniku (wspólne krawędzie sekcji na bordo). Tekst 16 px w grubości 400, do lewej, miara do ok. 62 znaków.
- * Ruch: wspólny wjazd kart, zdjęcie osiada w ramce (scale 1,12 do 1, tylko transform).
+ * Ruch: karty wjeżdżają przechylone i prostują się na osi przewijania (ever.co.id), zdjęcie osiada w ramce (scale 1,12 do 1).
  */
 
 .vs-opinie {
@@ -1705,14 +1847,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	list-style: none;
 }
 
+/* Linia nad opinią należy do karty, żeby jechała razem z nią (ruch niżej). */
 .vs-opinie__opinia {
 	container-type: inline-size;
-	padding-top: 24px;
-	border-top: 1px solid var(--vs-linia);
 }
 
 .vs-opinie__karta {
 	display: grid;
+	padding-top: 24px;
+	border-top: 1px solid var(--vs-linia);
 	grid-template-columns: 5.5rem minmax(0, 1fr);
 	grid-template-areas:
 		"zdjecie kto"
@@ -1821,13 +1964,68 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	transition-delay: var(--vs-opoznienie, 0ms);
 }
 
-/* Karty wchodzą z boków (plan ruchu Igora 20.10.2026: inny ruch niż sekcja przed nią): pierwsza z lewej, druga z prawej. */
+/* Bez osi widoku: karty wchodzą z boków (wspólny wjazd), pierwsza z lewej, druga z prawej. */
 .vs-ruch .vs-opinie__opinia[data-vs-wjazd]:not(.is-widoczny):nth-child(odd) {
 	translate: -48px 0;
 }
 
 .vs-ruch .vs-opinie__opinia[data-vs-wjazd]:not(.is-widoczny):nth-child(even) {
 	translate: 48px 0;
+}
+
+/*
+ * Rozrzucone karty (wzór ever.co.id, pomiar 20.10.2026: karty usług leżą przechylone jak rzucone zdjęcia).
+ * Karta opinii wjeżdża z dołu przechylona (pierwsza w lewo, druga w prawo, każda trochę inaczej) i prostuje się
+ * na osi przewijania, zanim dojdzie do połowy ekranu; przy powrocie w górę znów się przechyla.
+ * Oś widoku ma pozycja listy (li), a rusza się karta w środku, więc ruch nie zmienia własnej osi.
+ * Tylko translate, rotate i opacity (wątek grafiki). Bez osi widoku albo przy ograniczonym ruchu: wjazd z boków albo nic.
+ */
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-ruch .vs-opinie__opinia[data-vs-wjazd]:not(.is-widoczny) {
+			opacity: 1;
+			translate: none;
+		}
+
+		.vs-opinie__opinia {
+			view-timeline: --vs-opinia block;
+		}
+
+		.vs-opinie__karta {
+			--kat: -6deg;
+			--x: -5vw;
+			transform-origin: 50% 100%;
+			animation: vs-opinie-karta linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-opinia;
+			animation-range: entry 0% cover 45%;
+		}
+
+		.vs-opinie__opinia:nth-child(even) .vs-opinie__karta {
+			--kat: 5deg;
+			--x: 5vw;
+		}
+
+		.vs-opinie__opinia:nth-child(3n) .vs-opinie__karta {
+			--kat: -3.5deg;
+		}
+	}
+}
+
+@keyframes vs-opinie-karta {
+	from {
+		opacity: 0;
+		translate: var(--x) 22vh;
+		rotate: var(--kat);
+	}
+	35% {
+		opacity: 1;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+		rotate: 0deg;
+	}
 }
 
 
@@ -2059,9 +2257,18 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
+/*
+ * Pytania wjeżdżają z prawej po kolei co 120 ms (wspólny wjazd, ever.co.id: wiersze z boku), a kolumna z lewej
+ * stoi przyklejona; inny kierunek niż w O mnie (tekst z lewej), więc sekcje nie ruszają się tak samo.
+ */
+.vs-ruch .vs-faq__pytanie[data-vs-wjazd]:not(.is-widoczny) {
+	translate: 64px 0;
+}
+
 
 </style>
-<style>/*
+<style id="visual-scale-kontakt-style-inline-css">
+/*
  * Kontakt (sekcja 10) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
  * bordo; zdjęcie 25,4% szerokości od 13,5%, z „Do zobaczenia!” pismem mazakiem na dole zdjęcia (przechył ok. 16°);
  * odstęp 11,7%; KONTAKT (Oswald ok. 74 px) i formularz 28,1% szerokości: pola z białą ramką 69 px, wiadomość 212 px,
@@ -2332,6 +2539,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 .vs-kontakt__wiadomosc { --i: 2; }
 .vs-kontakt__wysylka { --i: 3; }
 
+
+
 </style>
 <style id="wp-block-group-inline-css">
 .wp-block-group{box-sizing:border-box}:where(.wp-block-group.wp-block-group-is-layout-constrained){position:relative}
@@ -2517,9 +2726,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 
 	/*
-	 * Nagłówek sekcji w parze krojów (vs_tytul() w inc/pomocnicze.php), wzór lecharme.beauty.
-	 * Część główna wysuwa się spod krawędzi swojego wiersza (maska to overflow, nic poza translate się nie animuje),
-	 * dopisek kursywą pojawia się 150 ms po niej. Sam nagłówek stoi, jedzie tylko jego zawartość.
+	 * Nagłówek sekcji w parze krojów (vs_tytul() w inc/pomocnicze.php), wzory lecharme.beauty i ever.co.id.
+	 * Litery części głównej wysuwają się po kolei spod krawędzi wiersza (maska to overflow, animuje się tylko translate),
+	 * dopisek kursywą pojawia się 350 ms po pierwszej literze. Sam nagłówek stoi, jedzie tylko jego zawartość.
 	 */
 	.vs-tytul__wiersz {
 		display: block;
@@ -2538,7 +2747,17 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		translate: none;
 	}
 
-	.vs-ruch [data-vs-wjazd="tytul"] .vs-tytul__glowna {
+	/* Litery (vs_litery): słowo trzyma swoje litery razem, litera to osobny element do ruchu. */
+	.vs-litery__slowo {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.vs-litera {
+		display: inline-block;
+	}
+
+	.vs-ruch [data-vs-wjazd="tytul"]:not(.is-widoczny) .vs-litera {
 		translate: 0 110%;
 	}
 
@@ -2547,10 +2766,10 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		translate: 0 0.3em;
 	}
 
-	.vs-ruch [data-vs-wjazd="tytul"].is-widoczny .vs-tytul__glowna {
-		translate: 0 0;
-		transition: translate 900ms var(--vs-ruch-wyjscie);
-		transition-delay: var(--vs-opoznienie, 0ms);
+	/* Litery wysuwają się po kolei co 45 ms (ever.co.id: stagger 0,03 s), każda ze swojego miejsca pod krawędzią wiersza. */
+	.vs-ruch [data-vs-wjazd="tytul"].is-widoczny .vs-litera {
+		transition: translate 1000ms var(--vs-ruch-wyjscie);
+		transition-delay: calc(var(--vs-opoznienie, 0ms) + var(--i, 0) * 45ms);
 	}
 
 	.vs-ruch [data-vs-wjazd="tytul"].is-widoczny .vs-tytul__dopisek {
@@ -2559,7 +2778,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		transition:
 			opacity 700ms var(--vs-ruch-wyjscie),
 			translate 700ms var(--vs-ruch-wyjscie);
-		transition-delay: calc(var(--vs-opoznienie, 0ms) + 150ms);
+		transition-delay: calc(var(--vs-opoznienie, 0ms) + 350ms);
 	}
 
 	/*
@@ -2922,7 +3141,7 @@ if ( czekajace.size ) {
 						<img width="2560" height="1440" src="media/hero.webp" class="vs-hero__img" alt="Marta Majewska w kremowym garniturze na bordowym tle" loading="eager" fetchpriority="high" decoding="async" />		</picture>
 	
 	<h1 class="vs-hero__tytul" id="vs-hero-tytul">
-		<span class="vs-wordmark"><span class="vs-wordmark__glowna">Beauty</span> <span class="vs-wordmark__dopisek">Studio</span></span>					<span class="vs-hero__podpis">Makijaż ślubny i wieczorowy · Miasto</span>
+		<span class="vs-wordmark"><span class="vs-wordmark__glowna"><span class="vs-ukryte">Beauty</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">B</span><span class="vs-litera" style="--i: 1">e</span><span class="vs-litera" style="--i: 2">a</span><span class="vs-litera" style="--i: 3">u</span><span class="vs-litera" style="--i: 4">t</span><span class="vs-litera" style="--i: 5">y</span></span></span></span> <span class="vs-wordmark__dopisek"><span class="vs-ukryte">Studio</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 6">S</span><span class="vs-litera" style="--i: 7">t</span><span class="vs-litera" style="--i: 8">u</span><span class="vs-litera" style="--i: 9">d</span><span class="vs-litera" style="--i: 10">i</span><span class="vs-litera" style="--i: 11">o</span></span></span></span></span>					<span class="vs-hero__podpis">Makijaż ślubny i wieczorowy · Miasto</span>
 			</h1>
 
 	<a class="vs-przycisk vs-hero__rezerwacja" href="#kontakt">
@@ -2979,7 +3198,7 @@ if ( czekajace.size ) {
 <section class="vs-cennik wp-block-visual-scale-cennik" id="cennik" aria-labelledby="vs-cennik-tytul">
 	<div class="vs-cennik__wnetrze">
 		<div class="vs-cennik__glowka">
-			<h2 class="vs-tytul vs-cennik__tytul" id="vs-cennik-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-cennik__tytul-glowna">Cennik</span></span> <span class="vs-tytul__dopisek vs-cennik__tytul-dopisek">Usług</span></h2>					</div>
+			<h2 class="vs-tytul vs-cennik__tytul" id="vs-cennik-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-cennik__tytul-glowna"><span class="vs-ukryte">Cennik</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">C</span><span class="vs-litera" style="--i: 1">e</span><span class="vs-litera" style="--i: 2">n</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">k</span></span></span></span></span> <span class="vs-tytul__dopisek vs-cennik__tytul-dopisek">Usług</span></h2>					</div>
 
 		<div class="vs-cennik__lista">
 											<div class="vs-cennik__kategoria" role="group" aria-labelledby="vs-cennik-1" data-vs-wjazd>
@@ -3085,7 +3304,7 @@ if ( czekajace.size ) {
 <section class="vs-opinie wp-block-visual-scale-opinie" id="opinie" aria-labelledby="vs-opinie-tytul">
 	<div class="vs-opinie__wnetrze">
 		<div class="vs-opinie__glowka">
-			<h2 class="vs-tytul vs-opinie__tytul" id="vs-opinie-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-opinie__tytul-glowna">Opinie</span></span> <span class="vs-tytul__dopisek vs-opinie__tytul-dopisek">klientek</span></h2>							<p class="vs-opinie__podsumowanie" data-vs-wjazd>
+			<h2 class="vs-tytul vs-opinie__tytul" id="vs-opinie-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-opinie__tytul-glowna"><span class="vs-ukryte">Opinie</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">O</span><span class="vs-litera" style="--i: 1">p</span><span class="vs-litera" style="--i: 2">i</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">e</span></span></span></span></span> <span class="vs-tytul__dopisek vs-opinie__tytul-dopisek">klientek</span></h2>							<p class="vs-opinie__podsumowanie" data-vs-wjazd>
 					<span class="vs-opinie__ocena"><span class="vs-ukryte">Ocena 5,0 na 5</span><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span>					<span>
 						5,0 na 5 z 64 opinii · Booksy					</span>
 									</p>

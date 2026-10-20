@@ -4324,8 +4324,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 @media (min-width: 64rem) {
 	.vs-szablon-1 .vs-dojazd {
-		/* Adres na 28 % szerokości mapy (ok. 25 % sekcji): po odsłoniętej stronie, także na starcie fali. */
-		--vs-dojazd-punkt-x: 28%;
+		/* Adres na 25 % szerokości mapy (ok. 22 % sekcji): cała biała etykieta po odsłoniętej stronie, także na starcie fali. */
+		--vs-dojazd-punkt-x: 25%;
 	}
 
 	/* Mapa od lewej krawędzi do 90 %: pełna część warstwy zawsze przykrywa jej prawą krawędź, także przy fali. */
@@ -4343,9 +4343,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		left: 0;
 	}
 
-	/* Warstwa czerni z prawej: pełna pod treścią, dalej prosty miękki brzeg (pięć przystanków). */
+	/* Warstwa czerni z prawej (68 % sekcji): pełna pod treścią, dalej prosty miękki brzeg (pięć przystanków), bez wejścia
+	 * na etykietę pinezki. */
 	.vs-szablon-1 .vs-dojazd::before {
 		inset: 0 0 0 auto;
+		width: 68%;
 		background: linear-gradient(
 			270deg,
 			var(--vs-dojazd-tlo) 0%,
@@ -4373,6 +4375,54 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	.vs-ruch .vs-szablon-1 .vs-dojazd__tresc [data-vs-wjazd]:not([data-vs-wjazd="tytul"], .is-widoczny) {
 		translate: 56px 0;
+	}
+}
+
+/*
+ * Profilowe wyżej (Igor 20.10.2026: „profilowe kółeczko daj trochę wyżej, bo zasłania napis”): na etykietę zachodzi
+ * 14 px zamiast 20, a nazwa zaczyna się 12 px pod kółkiem.
+ */
+.vs-szablon-1 .vs-pinezka__awatar {
+	margin-bottom: -14px;
+}
+
+.vs-szablon-1 .vs-pinezka__awatar + .vs-pinezka__znak {
+	padding-top: 26px;
+}
+
+/* Telefon: etykieta węższa (logo 18 px), żeby po podniesieniu profilowego nie dotykała przycisków +/− w prawym rogu. */
+@media (max-width: 63.99rem) {
+	.vs-szablon-1 .vs-pinezka__znak {
+		padding-inline: 16px;
+	}
+
+	.vs-szablon-1 .vs-pinezka__znak .vs-wordmark {
+		font-size: 18px;
+	}
+}
+
+/*
+ * Pinezka od razu (Igor: „pinezka od razu wskakiwała, a nie z opóźnieniem”): spada razem z falą (bez czekania 1,25 s),
+ * krócej (620 ms), punkt i fala z punktu w chwili lądowania (ok. 380 ms); warstwa czerni krótsza (1100 ms).
+ * Po sekwencji (is-po-fali) bez animacji, jak w szablonie 3, więc przeniesienie pinezki do żywej mapy niczego nie powtarza.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	.vs-ruch .vs-szablon-1 .vs-dojazd.is-fala:not(.is-po-fali) .vs-pinezka__cialo {
+		animation: vs-dojazd-upadek 620ms 0ms both;
+	}
+
+	.vs-ruch .vs-szablon-1 .vs-dojazd.is-fala:not(.is-po-fali) .vs-pinezka__punkt {
+		animation: vs-dojazd-punkt 260ms var(--vs-ruch-wyjscie) 380ms both;
+	}
+
+	.vs-ruch .vs-szablon-1 .vs-dojazd.is-fala:not(.is-po-fali) .vs-pinezka__fala {
+		animation: vs-dojazd-fala 1400ms var(--vs-ruch-wyjscie) 380ms 1 both;
+	}
+
+	@media (min-width: 64rem) {
+		.vs-ruch .vs-szablon-1 .vs-dojazd.is-fala::before {
+			transition-duration: 1100ms;
+		}
 	}
 }
 </style>
@@ -5446,7 +5496,8 @@ if ( sekcja && 'IntersectionObserver' in window ) {
 				setTimeout( ruszaj, 3000 );
 			}
 		},
-		{ threshold: 0.5 }
+		// Szablon 1 (Igor: „pinezka od razu, a nie z opóźnieniem”): sekwencja rusza, gdy mapa jest w 30 % na ekranie.
+		{ threshold: Number( sekcja.dataset.prog ) || 0.5 }
 	);
 	widok.observe( sekcja.querySelector( '.vs-dojazd__mapa' ) || sekcja );
 
@@ -5471,6 +5522,17 @@ if ( sekcja && 'IntersectionObserver' in window ) {
 			{ rootMargin: '2000px 0px' }
 		);
 		wyprzedzenie.observe( sekcja );
+		// Obraz mapy także w wolnej chwili zaraz po wczytaniu strony (Igor: „wszystko od razu, bez czekania”): przy szybkim
+		// przewinięciu palcem obraz jest już w pamięci, zanim sekcja wjedzie. Po pierwszym ekranie, więc nie spowalnia startu.
+		const pobierzObraz = () => wolnaChwila( 2000 ).then( () => {
+			wyprzedzenie.disconnect();
+			obraz.loading = 'eager';
+		} );
+		if ( document.readyState === 'complete' ) {
+			pobierzObraz();
+		} else {
+			addEventListener( 'load', pobierzObraz, { once: true } );
+		}
 		const gotowy = () => {
 			mapaGotowa = true;
 			sprobuj();
@@ -6088,7 +6150,7 @@ if ( czekajace.size ) {
 </section>
 
 
-<section class="vs-dojazd wp-block-visual-scale-dojazd" id="dojazd" aria-labelledby="vs-dojazd-tytul">
+<section class="vs-dojazd wp-block-visual-scale-dojazd" id="dojazd" aria-labelledby="vs-dojazd-tytul" data-prog="0.3">
 			<figure class="vs-dojazd__mapa" data-vs-wjazd>
 			<div
 				class="vs-dojazd__plotno"

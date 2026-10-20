@@ -1017,6 +1017,45 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	text-wrap: pretty;
 }
 
+/*
+ * Szablon 1, komputer (Igor 20.10.2026: „zamiast booksy w prawym dolnym rogu … pod frazą kosmetologia miasto … żeby było
+ * też na środku, bo jest na to miejsce”): ocena w kolumnie tekstu, na środku pod zawodem i miastem, przed zdaniem o pracy.
+ * W kodzie zostaje za zdaniem (na telefonie stoi pod przyciskiem, jak wcześniej ustalił Igor), więc na komputerze
+ * miejsce daje jej siatka. Ocena zawsze w jednym wierszu: „5,0” z gwiazdkami | znak Booksy i liczba opinii.
+ */
+@media (min-width: 64rem) {
+	.vs-szablon-1 .vs-hero__tytul {
+		grid-row: 1;
+	}
+
+	.vs-szablon-1 .vs-hero__ocena {
+		position: static;
+		grid-row: 2;
+		justify-self: center;
+		flex-direction: row;
+		align-items: center;
+		gap: 20px;
+		margin-top: clamp(28px, 4.5svh, 48px);
+		text-align: start;
+	}
+
+	.vs-szablon-1 .vs-hero__ocena-wynik {
+		justify-items: center;
+	}
+
+	.vs-szablon-1 .vs-hero__ocena-opis {
+		justify-items: start;
+		gap: 9px;
+		padding-left: 20px;
+		border-left: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+	}
+
+	.vs-szablon-1 .vs-hero__obietnica {
+		grid-row: 3;
+		margin-top: clamp(28px, 5.5svh, 64px);
+	}
+}
+
 /* Telefon w pionie: zdjęcie na cały ekran, tekst, przycisk i ocena na dole na ciemnym garniturze (przyciemnienie od dołu). */
 @media (orientation: portrait) and (max-width: 63.99rem) {
 	.vs-szablon-1 .vs-hero {
@@ -1680,9 +1719,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 /*
  * Szablon 1 (czarno-biały Adriana, pomiar projektu 1920 px): tytuł „CENNIK USŁUG” Gildą (wersalik 42 px), pod nim kategorie
- * w cienkich liniach: wiersz z nazwą (Gilda 31 px, 120 px wysokości), pod nim treść w dwóch kolumnach: opis z lewej
- * (Montserrat 16 px, interlinia 26 px, justowany) i ceny z prawej za pionową kreską. U Adriana kategorie rozwijają się
- * plusem; u nas wszystkie otwarte od razu (Igor: „bez klikania”), więc bez plusów i minusów.
+ * w cienkich liniach: wiersz z nazwą (Gilda 31 px, 120 px wysokości) i plusem, pod nim treść w dwóch kolumnach: opis
+ * z lewej (Montserrat 16 px, interlinia 26 px, justowany) i ceny z prawej za pionową kreską. Akordeon jak u Adriana
+ * (Igor 20.10.2026): pierwsza kategoria otwarta, kolejne otwierają się plusem (natywne details), plus zmienia się w minus.
  * Linie z tokenu linii przygaszonego do czerni (62 %, kreska 45 %), jak w projekcie (#505052, #393939).
  */
 .vs-szablon-1 .vs-cennik {
@@ -1717,10 +1756,10 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	position: relative;
 }
 
-/* Linie: nad kategorią, pod nazwą i pod ostatnią kategorią; osobne warstwy, żeby rysowały się od lewej. */
+/* Linie: nad kategorią, pod wierszem otwartej kategorii i pod ostatnią; osobne warstwy, żeby rysowały się od lewej. */
 .vs-szablon-1 .vs-cennik__kategoria::before,
 .vs-szablon-1 .vs-cennik__kategoria:last-child::after,
-.vs-szablon-1 .vs-cennik__nazwa::after {
+.vs-szablon-1 .vs-cennik__wiersz::after {
 	content: "";
 	position: absolute;
 	inset-inline: 0;
@@ -1734,22 +1773,90 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 .vs-szablon-1 .vs-cennik__kategoria:last-child::after,
-.vs-szablon-1 .vs-cennik__nazwa::after {
+.vs-szablon-1 .vs-cennik__wiersz::after {
 	bottom: 0;
 }
 
-.vs-szablon-1 .vs-cennik__nazwa {
+.vs-szablon-1 .vs-cennik__kategoria:not([open]) .vs-cennik__wiersz::after {
+	display: none;
+}
+
+/* Wiersz kategorii to przycisk akordeonu (summary): nazwa z lewej, plus z prawej, cały wiersz klikalny. */
+.vs-szablon-1 .vs-cennik__wiersz {
 	position: relative;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
 	min-height: clamp(76px, 6.25vw, 120px);
-	margin: 0;
 	padding-block: 16px;
+	list-style: none;
+	cursor: pointer;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.vs-szablon-1 .vs-cennik__wiersz::-webkit-details-marker {
+	display: none;
+}
+
+.vs-szablon-1 .vs-cennik__wiersz:focus-visible {
+	outline-offset: 4px;
+}
+
+.vs-szablon-1 .vs-cennik__nazwa {
+	margin: 0;
 	font-size: clamp(1.5rem, 1.64vw, 2rem);
 	font-weight: 400;
 	letter-spacing: 0;
 	line-height: 1.2;
 	text-transform: none;
+	transition: opacity 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-szablon-1 .vs-cennik__wiersz:hover .vs-cennik__nazwa {
+		opacity: 0.75;
+	}
+}
+
+/* Plus rysowany w CSS jak w FAQ; przy otwarciu pionowa kreska obraca się w poziomą (minus). */
+.vs-szablon-1 .vs-cennik__ikona {
+	position: relative;
+	flex: none;
+	width: 18px;
+	aspect-ratio: 1;
+}
+
+.vs-szablon-1 .vs-cennik__ikona::before,
+.vs-szablon-1 .vs-cennik__ikona::after {
+	content: "";
+	position: absolute;
+	inset: calc(50% - 1px) 0 auto;
+	height: 2px;
+	background: currentColor;
+}
+
+.vs-szablon-1 .vs-cennik__ikona::after {
+	rotate: 90deg;
+	transition: rotate 250ms var(--vs-ruch-wyjscie);
+}
+
+.vs-szablon-1 .vs-cennik__kategoria[open] .vs-cennik__ikona::after {
+	rotate: 0deg;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.vs-szablon-1 .vs-cennik__kategoria[open] .vs-cennik__tresc {
+		animation: vs-cennik-tresc 320ms var(--vs-ruch-wyjscie);
+	}
+}
+
+@keyframes vs-cennik-tresc {
+	from {
+		opacity: 0;
+		translate: 0 -6px;
+	}
 }
 
 .vs-szablon-1 .vs-cennik__tresc {
@@ -1836,7 +1943,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
  */
 .vs-ruch .vs-szablon-1 .vs-cennik__kategoria:not(.is-widoczny)::before,
 .vs-ruch .vs-szablon-1 .vs-cennik__kategoria:not(.is-widoczny)::after,
-.vs-ruch .vs-szablon-1 .vs-cennik__kategoria:not(.is-widoczny) .vs-cennik__nazwa::after {
+.vs-ruch .vs-szablon-1 .vs-cennik__kategoria:not(.is-widoczny) .vs-cennik__wiersz::after {
 	scale: 0 1;
 }
 
@@ -1849,7 +1956,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	transition: scale 1100ms var(--vs-ruch-wyjscie) var(--vs-opoznienie, 0ms);
 }
 
-.vs-ruch .vs-szablon-1 .vs-cennik__kategoria.is-widoczny .vs-cennik__nazwa::after {
+.vs-ruch .vs-szablon-1 .vs-cennik__kategoria.is-widoczny .vs-cennik__wiersz::after {
 	transition: scale 1100ms var(--vs-ruch-wyjscie) calc(var(--vs-opoznienie, 0ms) + 150ms);
 }
 
@@ -2763,13 +2870,13 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 
 /*
- * Szablon 1 (czarno-biały Adriana, pomiar 1920 px): „OPINIE” Gildą na środku (wersalik 42 px), pod nim opinia na środku:
- * treść Montserrat 16 px z dużą interlinią, imię, gwiazdki. U Adriana karuzela; u nas wszystkie opinie naraz
- * (bez klikania), na komputerze obok siebie z pionową kreską jak w cenniku, na telefonie jedna pod drugą.
- * Bez linii nad kartą i bez podsumowania w nagłówku (ocena jest w pierwszym ekranie).
+ * Szablon 1 (czarno-biały Adriana, pomiar 1920 px): „OPINIE” Gildą na środku (wersalik 42 px), pod nim slider jak u Adriana
+ * (Igor 20.10.2026): jedna opinia na środku (treść Montserrat 16 px z dużą interlinią, imię, gwiazdki), strzałki po bokach
+ * (u Adriana x 315 i 1605 przy 1920 px), kropki pod opinią. Pas opinii przewija się w bok z przyciąganiem, więc palcem
+ * i z klawiatury działa bez skryptu; strzałki i kropki pokazuje view.js. Telefon: strzałki i kropki w jednym rzędzie
+ * pod opinią. Bez linii nad kartą, bez podsumowania w nagłówku (ocena jest w pierwszym ekranie).
  */
 .vs-szablon-1 .vs-opinie {
-	--vs-opinie-kreska: color-mix(in srgb, var(--vs-linia) 45%, var(--vs-ciemne));
 	padding-block: clamp(80px, 14vw, 270px) clamp(80px, 11vw, 210px);
 	text-align: center;
 }
@@ -2793,13 +2900,48 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	letter-spacing: -0.02em;
 }
 
+/* Slider: telefon pas na górze, pod nim strzałka, kropki, strzałka (kolejność jak w kodzie). */
+.vs-szablon-1 .vs-opinie__slider {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-template-areas:
+		"pas pas pas"
+		"wstecz kropki dalej";
+	align-items: center;
+	justify-content: center;
+	gap: 28px 12px;
+	width: 100%;
+	margin-inline: auto;
+}
+
 .vs-szablon-1 .vs-opinie__lista {
-	grid-template-columns: minmax(0, 1fr);
-	gap: 64px;
+	grid-area: pas;
+	display: grid;
+	grid-template-columns: none;
+	grid-auto-columns: 100%;
+	grid-auto-flow: column;
+	gap: 0;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+}
+
+.vs-szablon-1 .vs-opinie__lista::-webkit-scrollbar {
+	display: none;
+}
+
+.vs-szablon-1 .vs-opinie__lista:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 8px;
 }
 
 .vs-szablon-1 .vs-opinie__opinia {
 	position: relative;
+	container-type: normal;
+	padding-inline: 4px;
+	scroll-snap-align: center;
+	scroll-snap-stop: always;
 }
 
 .vs-szablon-1 .vs-opinie__karta {
@@ -2809,9 +2951,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	gap: 0;
 	padding: 0;
 	border: 0;
+	animation: none;
 }
 
 .vs-szablon-1 .vs-opinie__tekst p {
+	max-width: 48rem;
 	margin-inline: auto;
 	font-size: 0.9375rem;
 	line-height: 1.85;
@@ -2840,57 +2984,118 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	height: 18px;
 }
 
-@media (min-width: 64rem) {
-	.vs-szablon-1 .vs-opinie__lista {
-		grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-		gap: 0;
+/* Strzałki: cienkie (Phosphor caret light) i szare jak u Adriana, białe po najechaniu; pole 48 px. */
+.vs-szablon-1 .vs-opinie__strzalka {
+	display: grid;
+	place-items: center;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: color-mix(in srgb, var(--vs-na-ciemnym) 60%, var(--vs-ciemne));
+	cursor: pointer;
+	transition: color 200ms ease, translate 200ms var(--vs-ruch-wyjscie);
+}
+
+.vs-szablon-1 .vs-opinie__strzalka[hidden],
+.vs-szablon-1 .vs-opinie__kropki[hidden] {
+	display: none;
+}
+
+.vs-szablon-1 .vs-opinie__strzalka--wstecz {
+	grid-area: wstecz;
+}
+
+.vs-szablon-1 .vs-opinie__strzalka--dalej {
+	grid-area: dalej;
+}
+
+.vs-szablon-1 .vs-opinie__strzalka-ikona {
+	width: 36px;
+	height: 36px;
+}
+
+.vs-szablon-1 .vs-opinie__strzalka:active {
+	scale: 0.94;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-szablon-1 .vs-opinie__strzalka:hover {
+		color: var(--vs-na-ciemnym);
 	}
 
-	.vs-szablon-1 .vs-opinie__opinia {
-		padding-inline: clamp(32px, 4.2vw, 80px);
+	.vs-szablon-1 .vs-opinie__strzalka--wstecz:hover {
+		translate: -3px 0;
 	}
 
-	.vs-szablon-1 .vs-opinie__opinia + .vs-opinie__opinia::before {
-		content: "";
-		position: absolute;
-		inset-block: 0;
-		inset-inline-start: 0;
-		width: 1px;
-		background: var(--vs-opinie-kreska);
-		transform-origin: center top;
+	.vs-szablon-1 .vs-opinie__strzalka--dalej:hover {
+		translate: 3px 0;
+	}
+}
+
+/* Kropki: 10 px, bieżąca biała, reszta szara; pole każdej 24 px. */
+.vs-szablon-1 .vs-opinie__kropki {
+	display: flex;
+	grid-area: kropki;
+	justify-content: center;
+	gap: 0;
+}
+
+.vs-szablon-1 .vs-opinie__kropka {
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.vs-szablon-1 .vs-opinie__kropka::before {
+	content: "";
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--vs-na-ciemnym) 45%, var(--vs-ciemne));
+	transition: background-color 200ms ease, scale 200ms var(--vs-ruch-wyjscie);
+}
+
+.vs-szablon-1 .vs-opinie__kropka[aria-current="true"]::before {
+	background: var(--vs-na-ciemnym);
+}
+
+@media (min-width: 48rem) {
+	.vs-szablon-1 .vs-opinie__slider {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		grid-template-areas:
+			"wstecz pas dalej"
+			". kropki .";
+		width: min(100%, 68vw);
+		gap: clamp(40px, 5.6vw, 108px) clamp(16px, 3vw, 56px);
+	}
+
+	.vs-szablon-1 .vs-opinie__strzalka {
+		width: 56px;
+		height: 56px;
+	}
+
+	.vs-szablon-1 .vs-opinie__strzalka-ikona {
+		width: 44px;
+		height: 44px;
 	}
 
 	.vs-szablon-1 .vs-opinie__tekst p {
 		font-size: 1rem;
-		line-height: 2;
+		line-height: 2.1;
 	}
 }
 
-/* Ruch: karty przechylone mniej niż w szablonie 3 (sam tekst, bez ramki), kreska między nimi rysuje się od góry. */
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		.vs-szablon-1 .vs-opinie__karta {
-			--kat: -3deg;
-			--x: -3vw;
-		}
-
-		.vs-szablon-1 .vs-opinie__opinia:nth-child(even) .vs-opinie__karta {
-			--kat: 2.5deg;
-			--x: 3vw;
-		}
-
-		.vs-szablon-1 .vs-opinie__opinia + .vs-opinie__opinia::before {
-			animation: vs-opinie-kreska linear both;
-			animation-duration: auto;
-			animation-timeline: --vs-opinia;
-			animation-range: entry 30% cover 50%;
-		}
-	}
-}
-
-@keyframes vs-opinie-kreska {
-	from {
-		scale: 1 0;
+/* Komputer: opinia w trzech wierszach jak u Adriana (ok. 915 px przy 1920). */
+@media (min-width: 64rem) {
+	.vs-szablon-1 .vs-opinie__tekst p {
+		max-width: 58rem;
 	}
 }
 </style>
@@ -4209,6 +4414,63 @@ if ( menu ) {
 }
 </script>
 <script type="module">/**
+ * Slider opinii (szablon 1, Igor 20.10.2026: „za pomocą slidera, lewo, prawo, tak jak grafik ma”).
+ * Pas opinii przewija się w bok z przyciąganiem w CSS, więc palcem i z klawiatury (strzałki na pasie) działa bez skryptu.
+ * Skrypt dokłada strzałki i kropki: strzałka przesuwa o jedną opinię (z ostatniej na pierwszą i odwrotnie),
+ * kropka skacze do swojej, a kropka bieżącej opinii ma aria-current. Ograniczony ruch: przeskok bez animacji.
+ * Na stronie bez slidera (szablon 3) kończy działanie od razu.
+ */
+for ( const slider of document.querySelectorAll( '[data-vs-slider]' ) ) {
+	const pas = slider.querySelector( '.vs-opinie__lista' );
+	const slajdy = pas ? [ ...pas.children ] : [];
+	if ( slajdy.length < 2 ) {
+		continue;
+	}
+	const kropki = [ ...slider.querySelectorAll( '.vs-opinie__kropka' ) ];
+	const strzalki = [ ...slider.querySelectorAll( '.vs-opinie__strzalka' ) ];
+	const spokojnie = matchMedia( '(prefers-reduced-motion: reduce)' );
+
+	const biezacy = () => Math.round( pas.scrollLeft / Math.max( 1, pas.clientWidth ) );
+	const idz = ( numer ) => {
+		const cel = ( numer + slajdy.length ) % slajdy.length;
+		pas.scrollTo( { left: cel * pas.clientWidth, behavior: spokojnie.matches ? 'auto' : 'smooth' } );
+	};
+	const zaznacz = () => {
+		const numer = biezacy();
+		kropki.forEach( ( kropka, i ) => {
+			if ( i === numer ) {
+				kropka.setAttribute( 'aria-current', 'true' );
+			} else {
+				kropka.removeAttribute( 'aria-current' );
+			}
+		} );
+	};
+
+	for ( const strzalka of strzalki ) {
+		strzalka.addEventListener( 'click', () => idz( biezacy() + Number( strzalka.dataset.kierunek ) ) );
+	}
+	kropki.forEach( ( kropka, i ) => kropka.addEventListener( 'click', () => idz( i ) ) );
+
+	let klatka = 0;
+	pas.addEventListener(
+		'scroll',
+		() => {
+			cancelAnimationFrame( klatka );
+			klatka = requestAnimationFrame( zaznacz );
+		},
+		{ passive: true }
+	);
+	zaznacz();
+
+	for ( const element of [ ...strzalki, slider.querySelector( '.vs-opinie__kropki' ) ] ) {
+		if ( element ) {
+			element.hidden = false;
+		}
+	}
+	slider.classList.add( 'is-gotowy' );
+}
+</script>
+<script type="module">/**
  * Prośba o termin bez zbierania danych (struktura 1.2): z pól formularza składamy wiadomość i otwieramy
  * SMS (telefon, dotyk) albo WhatsApp (komputer, mysz) z gotowym tekstem. Wysyła ją klientka ze swojego urządzenia.
  * Szablony zdań z danych klientki (kontakt.prosba): {imie} i {zabieg} podmieniamy na wartości z pól.
@@ -4496,9 +4758,12 @@ if ( czekajace.size ) {
 			<h2 class="vs-tytul vs-cennik__tytul" id="vs-cennik-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-cennik__tytul-glowna"><span class="vs-ukryte">Cennik usług</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">C</span><span class="vs-litera" style="--i: 1">e</span><span class="vs-litera" style="--i: 2">n</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">k</span></span> <span class="vs-litery__slowo"><span class="vs-litera" style="--i: 6">u</span><span class="vs-litera" style="--i: 7">s</span><span class="vs-litera" style="--i: 8">ł</span><span class="vs-litera" style="--i: 9">u</span><span class="vs-litera" style="--i: 10">g</span></span></span></span></span></h2>					</div>
 
 		<div class="vs-cennik__lista">
-											<div class="vs-cennik__kategoria" role="group" aria-labelledby="vs-cennik-1" data-vs-wjazd>
-					<h3 class="vs-cennik__nazwa" id="vs-cennik-1">Oczyszczanie wodorowe</h3>
-					<div class="vs-cennik__tresc"><p class="vs-cennik__opis">Zabieg łączący oczyszczanie, delikatne złuszczanie i nawilżanie skóry, bez okresu rekonwalescencji. Dobrze sprawdza się jako regularna pielęgnacja lub przygotowanie skóry do innych zabiegów.</p>					<ul class="vs-cennik__uslugi" role="list">
+																<details class="vs-cennik__kategoria" data-vs-wjazd open>
+						<summary class="vs-cennik__wiersz">
+							<h3 class="vs-cennik__nazwa" id="vs-cennik-1">Oczyszczanie wodorowe</h3>
+							<span class="vs-cennik__ikona" aria-hidden="true"></span>
+						</summary>
+									<div class="vs-cennik__tresc"><p class="vs-cennik__opis">Zabieg łączący oczyszczanie, delikatne złuszczanie i nawilżanie skóry, bez okresu rekonwalescencji. Dobrze sprawdza się jako regularna pielęgnacja lub przygotowanie skóry do innych zabiegów.</p>					<ul class="vs-cennik__uslugi" role="list">
 																				<li class="vs-cennik__usluga">
 								<span class="vs-cennik__usluga-nazwa">
 									Twarz																	</span>
@@ -4515,10 +4780,12 @@ if ( czekajace.size ) {
 																									<span class="vs-cennik__cena">420 zł</span>
 															</li>
 											</ul>
-					</div>				</div>
-											<div class="vs-cennik__kategoria" role="group" aria-labelledby="vs-cennik-2" data-vs-wjazd>
-					<h3 class="vs-cennik__nazwa" id="vs-cennik-2">Peelingi chemiczne</h3>
-					<div class="vs-cennik__tresc"><p class="vs-cennik__opis">Zabiegi złuszczające z użyciem kwasów, dobierane do typu skóry i jej potrzeb. Rodzaj i stężenie ustalamy po konsultacji, a po zabiegu otrzymujesz zalecenia pielęgnacyjne.</p>					<ul class="vs-cennik__uslugi" role="list">
+					</div>				</details>																<details class="vs-cennik__kategoria" data-vs-wjazd>
+						<summary class="vs-cennik__wiersz">
+							<h3 class="vs-cennik__nazwa" id="vs-cennik-2">Peelingi chemiczne</h3>
+							<span class="vs-cennik__ikona" aria-hidden="true"></span>
+						</summary>
+									<div class="vs-cennik__tresc"><p class="vs-cennik__opis">Zabiegi złuszczające z użyciem kwasów, dobierane do typu skóry i jej potrzeb. Rodzaj i stężenie ustalamy po konsultacji, a po zabiegu otrzymujesz zalecenia pielęgnacyjne.</p>					<ul class="vs-cennik__uslugi" role="list">
 																				<li class="vs-cennik__usluga">
 								<span class="vs-cennik__usluga-nazwa">
 									Peeling migdałowy																	</span>
@@ -4535,8 +4802,7 @@ if ( czekajace.size ) {
 																									<span class="vs-cennik__cena">400 zł</span>
 															</li>
 											</ul>
-					</div>				</div>
-					</div>
+					</div>				</details>					</div>
 
 			</div>
 </section>
@@ -4601,15 +4867,16 @@ if ( czekajace.size ) {
 		<div class="vs-opinie__glowka">
 			<h2 class="vs-tytul vs-opinie__tytul" id="vs-opinie-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-opinie__tytul-glowna"><span class="vs-ukryte">Opinie</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">O</span><span class="vs-litera" style="--i: 1">p</span><span class="vs-litera" style="--i: 2">i</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">e</span></span></span></span></span></h2>					</div>
 
-		<ul class="vs-opinie__lista" role="list">
-											<li class="vs-opinie__opinia is-bez-zdjecia" data-vs-wjazd>
+					<div class="vs-opinie__slider" data-vs-slider data-vs-wjazd>
+			<ul class="vs-opinie__lista" id="vs-opinie-lista" role="list" tabindex="0" aria-label="Opinie klientek">
+													<li class="vs-opinie__opinia is-bez-zdjecia">
 					<figure class="vs-opinie__karta">
 												<blockquote class="vs-opinie__tekst"><p>„To była moja pierwsza wizyta w gabinecie kosmetologicznym i obawiałam się, że będę zagubiona. Od początku wszystko zostało mi spokojnie wyjaśnione: co będzie się działo, jak wygląda zabieg i czego mogę się spodziewać. Czułam się zaopiekowana, a atmosfera była bardzo komfortowa. Chętnie wrócę.”</p></blockquote>						<figcaption class="vs-opinie__kto">
 							<span class="vs-opinie__imie">Anna K.</span>
 															<span class="vs-opinie__ocena"><span class="vs-ukryte">Ocena 5,0 na 5</span><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span>																				</figcaption>
 											</figure>
 				</li>
-											<li class="vs-opinie__opinia is-bez-zdjecia" data-vs-wjazd>
+											<li class="vs-opinie__opinia is-bez-zdjecia">
 					<figure class="vs-opinie__karta">
 												<blockquote class="vs-opinie__tekst"><p>„Cenię sobie rzetelność i brak nacisku. Podczas konsultacji dostałam jasny plan i informację, na czym polega każdy zabieg, bez przekonywania do niczego na siłę. Gabinet jest czysty i elegancki, a podejście bardzo profesjonalne. Polecam każdej, która szuka spokojnego miejsca.”</p></blockquote>						<figcaption class="vs-opinie__kto">
 							<span class="vs-opinie__imie">Karolina M.</span>
@@ -4617,7 +4884,14 @@ if ( czekajace.size ) {
 											</figure>
 				</li>
 					</ul>
-
+										<button class="vs-opinie__strzalka vs-opinie__strzalka--wstecz" type="button" data-kierunek="-1" aria-controls="vs-opinie-lista" hidden><svg class="vs-opinie__strzalka-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M164.24,203.76a6,6,0,1,1-8.48,8.48l-80-80a6,6,0,0,1,0-8.48l80-80a6,6,0,0,1,8.48,8.48L88.49,128Z"/></svg><span class="vs-ukryte">Poprzednia opinia</span></button>
+				<div class="vs-opinie__kropki" hidden>
+											<button class="vs-opinie__kropka" type="button" data-numer="0" aria-controls="vs-opinie-lista"><span class="vs-ukryte">Opinia 1 z 2</span></button>
+											<button class="vs-opinie__kropka" type="button" data-numer="1" aria-controls="vs-opinie-lista"><span class="vs-ukryte">Opinia 2 z 2</span></button>
+									</div>
+				<button class="vs-opinie__strzalka vs-opinie__strzalka--dalej" type="button" data-kierunek="1" aria-controls="vs-opinie-lista" hidden><svg class="vs-opinie__strzalka-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M180.24,132.24l-80,80a6,6,0,0,1-8.48-8.48L167.51,128,91.76,52.24a6,6,0,0,1,8.48-8.48l80,80A6,6,0,0,1,180.24,132.24Z"/></svg><span class="vs-ukryte">Następna opinia</span></button>
+			</div>
+		
 					<p class="vs-opinie__uwaga">Opinie przykładowe z projektu szablonu.</p>
 			</div>
 </section>

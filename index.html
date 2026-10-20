@@ -781,6 +781,46 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		opacity: 0;
 	}
 }
+
+/*
+ * Przewijanie jak na kulturapiekna.com (Igor, 20.10.2026): pierwszy ekran stoi przyklejony u góry, a następna sekcja
+ * wjeżdża na niego od dołu i go zakrywa („karta chowa się pod spodem”); zdjęcie w tym czasie delikatnie się przybliża
+ * (1 do 1,12 na wysokości ekranu, jak u nich ok. 1,04 na 300 px). Czysty CSS: sticky + animacja na osi przewijania
+ * (wątek grafiki, bez skryptu przy przewijaniu). Przybliża się ramka zdjęcia, bo samo zdjęcie ma animację wejścia na scale.
+ * Ekrany niższe niż 560 px: zwykłe przewijanie (pierwszy ekran wyższy niż okno schowałby swój dół pod następną sekcją).
+ * Ograniczony ruch: bez przybliżenia; nasuwanie zostaje, bo to układ, a nie animacja.
+ * Pasek górny i dolny pasek na telefonie liczą koniec pierwszego ekranu od znacznika granicy (pasek-gorny/view.js).
+ */
+@media (min-height: 35rem) {
+	.vs-hero {
+		position: sticky;
+		top: 0;
+		z-index: 0;
+	}
+
+	.vs-hero ~ * {
+		position: relative;
+		z-index: 1;
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	@media (min-height: 35rem) and (prefers-reduced-motion: no-preference) {
+		.vs-hero__zdjecie {
+			transform-origin: 50% 100%;
+			animation: vs-hero-zblizenie linear both;
+			animation-duration: auto;
+			animation-timeline: scroll(root);
+			animation-range: 0 100svh;
+		}
+	}
+}
+
+@keyframes vs-hero-zblizenie {
+	to {
+		scale: 1.12;
+	}
+}
 </style>
 <style id="visual-scale-efekty-style-inline-css">
 /*
@@ -2413,22 +2453,29 @@ if ( pasek ) {
 	} else {
 		const wysokosc = () => pasek.getBoundingClientRect().height;
 
-		// Pasek jest „na zdjęciu”, dopóki dół pierwszego ekranu jest pod nim.
+		// Pierwszy ekran jest przyklejony (hero/style.css), więc zawsze „widoczny”. Koniec pierwszego ekranu liczymy
+		// od znacznika granicy: zero wysokości, tuż za hero, czyli tam, gdzie zaczyna się następna sekcja.
+		const granica = document.createElement( 'div' );
+		granica.setAttribute( 'aria-hidden', 'true' );
+		granica.style.cssText = 'height: 0; margin: 0;';
+		hero.after( granica );
+
+		// Pasek jest „na zdjęciu”, dopóki następna sekcja nie dojdzie pod niego.
 		new IntersectionObserver(
 			( [ wpis ] ) => {
-				pasek.dataset.stan = wpis.isIntersecting ? 'na-zdjeciu' : 'przewiniety';
+				pasek.dataset.stan = wpis.boundingClientRect.top <= wysokosc() ? 'przewiniety' : 'na-zdjeciu';
 			},
 			{ rootMargin: `-${ Math.round( wysokosc() ) }px 0px 0px 0px` }
-		).observe( hero );
+		).observe( granica );
 
-		// Dolny pasek pokazujemy, gdy pierwszy ekran całkiem zniknął.
+		// Dolny pasek pokazujemy, gdy pierwszy ekran całkiem zniknął (następna sekcja doszła do góry ekranu).
 		if ( dolny ) {
 			dolny.inert = true;
 			new IntersectionObserver( ( [ wpis ] ) => {
-				const widoczny = ! wpis.isIntersecting;
+				const widoczny = wpis.boundingClientRect.top <= 0;
 				dolny.toggleAttribute( 'data-widoczny', widoczny );
 				dolny.inert = ! widoczny;
-			} ).observe( hero );
+			} ).observe( granica );
 		}
 	}
 }

@@ -4252,50 +4252,33 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*
  * Szablon 1 (czarno-biały, Igor 20.10.2026: „mapkę … tak samo podobnie, ale pod styl ten ciemny motyw … żeby to się
  * trochę różniło niż na tej stronie, ale było podobne”). Ta sama mechanika (gotowy obraz mapy, żywa mapa po animacji,
- * fala i upadek pinezki z awatarem), ale lustrzanie i nocą:
- * - komputer: mapa od lewej krawędzi do 90 % szerokości, treść w prawej połowie na czerni; warstwa czerni z prawej
+ * fala i upadek pinezki z awatarem), ale lustrzanie i w szarości:
+ * - komputer: mapa od lewej krawędzi do 90 % szerokości, treść w prawej połowie na jasnoszarym tle; warstwa tła z prawej
  *   z prostym, miękkim brzegiem (bez skosu: proste linie Adriana), przy wjeździe wpływa z prawej;
- * - kafle jak mapa nocą, spokojna (Adrian 21.10.2026: „mapka … zbyt nachalna jest jak na ten wzór strony”, Igor:
- *   „delikatnie bardziej subtelnie … mniej chaotycznie”): odwrócona szarość z małym kontrastem, ląd ciemnoszary,
- *   ulice, Wisła i podpisy ledwo zaznaczone; mapa wyłania się z czerni tylko wokół pinezki (światło niżej);
- * - pinezka biała z czarnym monogramem i nazwą (vs_logo), awatar w białej obwódce, biały punkt i fala;
+ * - sekcja jasnoszara, mapa w szarości (Adrian 21.10.2026: „mapka … zbyt nachalna jest jak na ten wzór strony”;
+ *   Igor: „nie musi aż tak być przyciemniona … żeby po prostu była subtelna … może zróbmy po prostu szarą tą sekcję,
+ *   bo kontakt mamy już czarny i stopkę mamy czarną”): kafle w szarości i półprzezroczyste na jasnoszarym tle, więc
+ *   ulice i podpisy są widoczne, ale miękkie; mapa oddalona (zoom 13 w danych), żeby było widać dzielnicę i miasto;
+ * - pinezka czarna z białym monogramem i nazwą (vs_logo), awatar w białej obwódce, czarny punkt i fala;
  * - tytuł Gildą wersalikami w dwóch wierszach, adres i „Wyznacz trasę” jak w stopce, ocena jak w pierwszym ekranie.
- * Telefon: mapa na górze z prostym zanikiem w czerń, treść pod nią do lewej.
+ * Telefon: mapa na górze z prostym zanikiem w tło, treść pod nią do lewej.
  */
 .vs-szablon-1 .vs-dojazd {
-	--vs-dojazd-tlo: var(--vs-ciemne);
-	--vs-dojazd-lad: #181818;
-	--vs-dojazd-linia: color-mix(in srgb, var(--vs-linia) 62%, var(--vs-ciemne));
-	/* Promienie światła wokół pinezki (szerokość, wysokość); na komputerze mniejsze, niżej. */
-	--vs-dojazd-swiatlo: 80vw 70vw;
+	/* Jasnoszare tło: ok. 13 % szarości linii Adriana (#808080) na bieli, między białym FAQ a czarnym Kontaktem.
+	 * Ląd to to samo tło (kafle są półprzezroczyste), dosłownie, bo narzedzia/mapa.mjs czyta tę wartość. */
+	--vs-dojazd-lad: #eeeeee;
+	--vs-dojazd-tlo: var(--vs-dojazd-lad);
+	--vs-dojazd-linia: color-mix(in srgb, var(--vs-linia) 45%, var(--vs-dojazd-lad));
 	overflow-x: clip;
-	color: var(--vs-na-ciemnym);
+	color: var(--vs-na-jasnym);
 }
 
 .vs-szablon-1 .vs-dojazd .leaflet-tile-pane {
-	filter: grayscale(1) invert(1) contrast(0.42) brightness(0.27);
+	filter: grayscale(1) opacity(0.7);
 }
 
-/*
- * Światło wokół pinezki: dalej od adresu mapa gaśnie w czerń sekcji, więc widać spokojną plamę ulic przy gabinecie,
- * a nie całe miasto. Warstwa nad mapą (Leaflet: mapa 400) i pod przyciskami +/− (800 i wyżej); środek przezroczysty,
- * więc etykieta pinezki zostaje czysta. Obraz mapy (mapa.mjs) ma same kafle, światło dokłada ta warstwa.
- */
-.vs-szablon-1 .vs-dojazd__plotno::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 450;
-	background: radial-gradient(
-		ellipse var(--vs-dojazd-swiatlo) at var(--vs-dojazd-punkt-x) 50%,
-		transparent 40%,
-		color-mix(in srgb, var(--vs-dojazd-tlo) 65%, transparent) 72%,
-		var(--vs-dojazd-tlo) 100%
-	);
-	pointer-events: none;
-}
 
-/* Telefon: prosty zanik w czerń od dołu (w szablonie 3 pochylony). */
+/* Telefon: prosty zanik w tło od dołu (w szablonie 3 pochylony). */
 .vs-szablon-1 .vs-dojazd__mapa::after {
 	background: linear-gradient(
 		180deg,
@@ -4307,8 +4290,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 .vs-szablon-1 .vs-dojazd__osm {
-	background: color-mix(in srgb, var(--vs-ciemne) 72%, transparent);
-	color: color-mix(in srgb, var(--vs-na-ciemnym) 82%, var(--vs-ciemne));
+	background: color-mix(in srgb, var(--vs-dojazd-tlo) 85%, transparent);
+	color: var(--vs-na-jasnym);
 }
 
 .vs-szablon-1 .vs-dojazd__tresc {
@@ -4350,9 +4333,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	gap: 12px;
 	margin-top: clamp(20px, 2vw, 32px);
 	padding-inline: 2rem;
-	border-color: var(--vs-linia);
+	border-color: var(--vs-ciemne);
 	background: transparent;
-	color: var(--vs-na-ciemnym);
+	color: var(--vs-na-jasnym);
 	font-size: 1.125rem;
 	font-weight: 500;
 	letter-spacing: 0;
@@ -4361,9 +4344,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 @media (hover: hover) and (pointer: fine) {
 	.vs-szablon-1 .vs-dojazd__trasa:hover {
-		border-color: var(--vs-na-ciemnym);
-		background: var(--vs-na-ciemnym);
-		color: var(--vs-ciemne);
+		border-color: var(--vs-ciemne);
+		background: var(--vs-ciemne);
+		color: var(--vs-na-ciemnym);
 	}
 }
 
@@ -4372,45 +4355,45 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	border-top-color: var(--vs-dojazd-linia);
 }
 
-/* Przyciski mapy: czarne kwadraty z szarą ramką, po najechaniu białe. */
+/* Przyciski mapy: białe kwadraty z szarą ramką, po najechaniu czarne. */
 .vs-szablon-1 .vs-dojazd .leaflet-control.leaflet-bar {
 	border-color: var(--vs-dojazd-linia);
 }
 
 .vs-szablon-1 .vs-dojazd .leaflet-control.leaflet-bar a {
 	border-bottom-color: var(--vs-dojazd-linia);
-	background: var(--vs-ciemne);
-	color: var(--vs-na-ciemnym);
+	background: var(--vs-jasne);
+	color: var(--vs-na-jasnym);
 }
 
 @media (hover: hover) and (pointer: fine) {
 	.vs-szablon-1 .vs-dojazd .leaflet-control.leaflet-bar a:hover {
-		background: var(--vs-na-ciemnym);
-		color: var(--vs-ciemne);
+		background: var(--vs-ciemne);
+		color: var(--vs-na-ciemnym);
 	}
 }
 
-/* Pinezka na mapie nocą: biała etykieta z czarnym logo, biały ogonek i punkt, awatar w białej obwódce. */
+/* Pinezka na jasnej mapie: czarna etykieta z białym logo, czarny ogonek i punkt, awatar w białej obwódce. */
 .vs-szablon-1 .vs-dojazd .vs-pinezka {
-	color: var(--vs-ciemne);
+	color: var(--vs-na-ciemnym);
 }
 
 .vs-szablon-1 .vs-dojazd .vs-pinezka:focus-visible .vs-pinezka__znak {
-	outline-color: var(--vs-jasne);
+	outline-color: var(--vs-ciemne);
 }
 
 .vs-szablon-1 .vs-pinezka__awatar {
 	border: 2px solid var(--vs-jasne);
 	box-shadow:
 		0 0 0 1px var(--vs-ciemne),
-		0 14px 28px -12px rgb(0 0 0 / 0.95);
+		0 14px 28px -12px rgb(0 0 0 / 0.5);
 }
 
 .vs-szablon-1 .vs-pinezka__znak {
 	gap: 9px;
 	padding: 14px 22px 12px;
-	background: var(--vs-jasne);
-	box-shadow: 0 18px 36px -14px rgb(0 0 0 / 0.95);
+	background: var(--vs-ciemne);
+	box-shadow: 0 18px 36px -14px rgb(0 0 0 / 0.55);
 }
 
 .vs-szablon-1 .vs-pinezka__znak .vs-wordmark {
@@ -4422,25 +4405,23 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 .vs-szablon-1 .vs-pinezka__ogon {
-	background: var(--vs-jasne);
+	background: var(--vs-ciemne);
 }
 
 .vs-szablon-1 .vs-pinezka__punkt {
-	border-color: var(--vs-ciemne);
-	background: var(--vs-jasne);
-	box-shadow: 0 0 0 1px var(--vs-jasne);
+	border-color: var(--vs-jasne);
+	background: var(--vs-ciemne);
+	box-shadow: 0 0 0 1px var(--vs-ciemne);
 }
 
 .vs-szablon-1 .vs-pinezka__fala {
-	border-color: var(--vs-jasne);
+	border-color: var(--vs-ciemne);
 }
 
 @media (min-width: 64rem) {
 	.vs-szablon-1 .vs-dojazd {
 		/* Adres na 25 % szerokości mapy (ok. 22 % sekcji): cała biała etykieta po odsłoniętej stronie, także na starcie fali. */
 		--vs-dojazd-punkt-x: 25%;
-		/* Procenty w rozmiarze gradientu z calc() Chrome odrzuca, więc vw i svh (mapa to 90 % szerokości sekcji). */
-		--vs-dojazd-swiatlo: clamp(300px, 27vw, 560px) clamp(330px, 48svh, 495px);
 	}
 
 	/* Mapa od lewej krawędzi do 90 %: pełna część warstwy zawsze przykrywa jej prawą krawędź, także przy fali. */
@@ -4458,7 +4439,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		left: 0;
 	}
 
-	/* Warstwa czerni z prawej (68 % sekcji): pełna pod treścią, dalej prosty miękki brzeg (pięć przystanków), bez wejścia
+	/* Warstwa tła z prawej (68 % sekcji): pełna pod treścią, dalej prosty miękki brzeg (pięć przystanków), bez wejścia
 	 * na etykietę pinezki. */
 	.vs-szablon-1 .vs-dojazd::before {
 		inset: 0 0 0 auto;
@@ -4480,7 +4461,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
-/* Ruch lustrzany: fala czerni wpływa z prawej, adres i ocena wjeżdżają z prawej. */
+/* Ruch lustrzany: fala tła wpływa z prawej, adres i ocena wjeżdżają z prawej. */
 @media (prefers-reduced-motion: no-preference) {
 	@media (min-width: 64rem) {
 		.vs-ruch .vs-szablon-1 .vs-dojazd:not(.is-fala)::before {
@@ -4518,7 +4499,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 /*
  * Pinezka od razu (Igor: „pinezka od razu wskakiwała, a nie z opóźnieniem”): spada razem z falą (bez czekania 1,25 s),
- * krócej (620 ms), punkt i fala z punktu w chwili lądowania (ok. 380 ms); warstwa czerni krótsza (1100 ms).
+ * krócej (620 ms), punkt i fala z punktu w chwili lądowania (ok. 380 ms); warstwa tła krótsza (1100 ms).
  * Po sekwencji (is-po-fali) bez animacji, jak w szablonie 3, więc przeniesienie pinezki do żywej mapy niczego nie powtarza.
  */
 @media (prefers-reduced-motion: no-preference) {
@@ -6271,7 +6252,7 @@ if ( czekajace.size ) {
 				data-vs-mapa
 				data-lat="50.0515"
 				data-lng="19.9446"
-				data-zoom="15"
+				data-zoom="13"
 				data-przyciski="bottomleft"
 				data-js="assets/leaflet.js"
 				data-css="assets/leaflet.css"

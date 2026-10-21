@@ -5100,8 +5100,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 </style>
-<style id="visual-scale-instagram-style-inline-css">
-/*
+<style>/*
  * Instagram (Igor 21.10.2026, wzór beautyismybusiness.pl, pod styl szablonu 1): jasna sekcja między czarnym kontaktem
  * a czarną stopką. U góry profil (zdjęcie w kółku z cienką obwódką, @nazwa Gildą, opis), liczby wielką Gildą jak słowa
  * na krawędziach sekcji, prostokątny przycisk z obrysem jak „Wyślij”. Pod spodem pasek postów na całą szerokość:
@@ -5127,11 +5126,69 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	margin-inline: auto;
 }
 
+/*
+ * Telefon (Igor: „z lewej samo profilowe, z prawej lawina tekstu”): obok zdjęcia tylko „Instagram” i @nazwa, więc obie
+ * strony wiersza mają podobną wysokość; nazwa profilu i opis schodzą pod spód na całą szerokość (opis bez własnej ramki,
+ * display: contents). Od 48rem wraca wiersz: zdjęcie | cały opis.
+ */
 .vs-instagram__profil {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	grid-template-areas:
+		"awatar nadtytul"
+		"awatar tytul"
+		"nazwa nazwa"
+		"bio bio";
+	column-gap: 16px;
+	row-gap: 6px;
 	align-items: center;
-	gap: clamp(16px, 1.7vw, 32px);
 	min-width: 0;
+}
+
+.vs-instagram__profil .vs-instagram__opis {
+	display: contents;
+}
+
+.vs-instagram__profil .vs-instagram__awatar {
+	grid-area: awatar;
+}
+
+.vs-instagram__profil .vs-instagram__nadtytul {
+	grid-area: nadtytul;
+	align-self: end;
+}
+
+.vs-instagram__profil .vs-instagram__tytul {
+	grid-area: tytul;
+	align-self: start;
+}
+
+.vs-instagram__profil .vs-instagram__nazwa {
+	grid-area: nazwa;
+	margin-top: 14px;
+}
+
+.vs-instagram__profil .vs-instagram__bio {
+	grid-area: bio;
+}
+
+@media (min-width: 48rem) {
+	.vs-instagram__profil {
+		display: flex;
+		gap: clamp(16px, 1.7vw, 32px);
+	}
+
+	.vs-instagram__profil .vs-instagram__opis {
+		display: grid;
+	}
+
+	.vs-instagram__profil .vs-instagram__opis > * {
+		grid-area: auto;
+	}
+
+	.vs-instagram__profil .vs-instagram__nazwa {
+		margin-top: 4px;
+	}
 }
 
 .vs-instagram__awatar {
@@ -5220,6 +5277,17 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 .vs-instagram__liczby li {
 	display: grid;
 	gap: 8px;
+}
+
+/* Wąski telefon (360 px): dwa podpisy wersalikami z rozstrzeleniem 0,31em nie mieszczą się obok siebie. */
+@media (max-width: 29.99rem) {
+	.vs-instagram__liczby {
+		gap: 24px;
+	}
+
+	.vs-instagram__liczby .vs-instagram__podpis {
+		letter-spacing: 0.2em;
+	}
 }
 
 .vs-instagram__wartosc {
@@ -5442,8 +5510,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		translate: -16vw 0;
 	}
 }
-
-
 </style>
 <style id="wp-block-group-inline-css">
 .wp-block-group{box-sizing:border-box}:where(.wp-block-group.wp-block-group-is-layout-constrained){position:relative}
@@ -6931,7 +6997,7 @@ if ( czekajace.size ) {
 						<div class="vs-instagram__opis">
 				<p class="vs-instagram__nadtytul"><svg class="vs-instagram__ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,82a46,46,0,1,0,46,46A46.06,46.06,0,0,0,128,82Zm0,80a34,34,0,1,1,34-34A34,34,0,0,1,128,162ZM176,26H80A54.06,54.06,0,0,0,26,80v96a54.06,54.06,0,0,0,54,54h96a54.06,54.06,0,0,0,54-54V80A54.06,54.06,0,0,0,176,26Zm42,150a42,42,0,0,1-42,42H80a42,42,0,0,1-42-42V80A42,42,0,0,1,80,38h96a42,42,0,0,1,42,42ZM190,76a10,10,0,1,1-10-10A10,10,0,0,1,190,76Z"/></svg><span>Instagram</span></p>
 				<h2 class="vs-instagram__tytul" id="vs-instagram-tytul"><a href="https://www.instagram.com/paulinaszymecka_instruktor/" target="_blank" rel="noopener">@paulinaszymecka_<wbr>instruktor<span class="vs-ukryte"> (otwiera się w nowej karcie)</span></a></h2>
-									<p class="vs-instagram__nazwa">SZKOLENIA | RZĘSY | UV | LIFTING | GRUDZIĄDZ</p>
+														<p class="vs-instagram__nazwa">SZKOLENIA | RZĘSY | UV | LIFTING | GRUDZIĄDZ</p>
 													<p class="vs-instagram__bio">Pokażę Ci, jak tworzyć rzęsy i nie martwić się o brak klientek.</p>
 							</div>
 		</div>

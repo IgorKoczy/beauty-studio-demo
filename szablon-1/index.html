@@ -1146,432 +1146,351 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 </style>
 <style>/*
- * Efekty: „Moje prace” Adriana (szablon 3). Para zdjęć w złotym podziale: duże : małe = 1,618 : 1,
- * w drugim rzędzie odwrotnie. Siatka 1fr 0,618fr 1fr daje obie pary w jednym układzie.
- * Zdjęcie wjeżdża czarno-białe (jak u Adriana) i samo „wywołuje się” w kolorze, raz, na każdym ekranie.
+ * O mnie (sekcja 07) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
+ * tekst od 8,65% szerokości, kolumna 35,2%; portret (wycięty PNG) 47,4% szerokości przy prawej i dolnej krawędzi;
+ * „O mnie” pismem Meddon, czerwone, od 36% szerokości, na dole, przed zdjęciem.
+ * Telefon (struktura 1.2): portret z „O mnie” na dole zdjęcia, pod nim imię i tekst.
+ * Typografia (better-typography): akapity 16 px w grubości 400, miara do ok. 76 znaków; u Adriana 15 px light,
+ * justowane (jak w cenniku: do potwierdzenia z Adrianem). Kolor tekstu z palety (bordo), nie czarny.
+ * Ruch: wspólny wjazd (data-vs-wjazd), ten sam rytm co reszta strony.
  */
 
-.vs-efekty {
-	padding-block: clamp(72px, 9vw, 150px);
-	background: var(--vs-jasne);
-	color: var(--vs-ciemne);
-}
-
-.vs-efekty__wnetrze {
-	width: min(100% - 2 * var(--vs-margines), 1580px);
-	margin-inline: auto;
-}
-
-@media (min-width: 64rem) {
-	.vs-efekty__wnetrze {
-		width: min(100% - 2 * var(--vs-margines), 82.3vw, 1580px);
-	}
-}
-
-.vs-efekty__glowka {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 12px 32px;
-	margin-bottom: clamp(20px, 2.4vw, 36px);
-}
-
-.vs-efekty__tytul {
-	order: 2;
-	margin: 0 -0.5em 0 auto;
-	font-family: var(--wp--custom--font--naglowek);
-	font-size: clamp(14px, 1.15vw, 19px);
-	font-weight: 500;
-	letter-spacing: 0.5em;
-	line-height: 1.2;
-	text-transform: uppercase;
-}
-
-.vs-efekty__opis {
-	order: 1;
-	max-width: 46ch;
-	margin: 0;
-	font-size: 15px;
-	font-weight: 400;
-	line-height: 1.6;
-}
-
-/* Siatka: telefon 2 kolumny (duże przez całą szerokość), od tabletu złoty podział. */
-.vs-efekty__siatka {
+.vs-o-mnie {
 	position: relative;
 	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px;
-	margin: 0;
-	padding: 0;
-	list-style: none;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas:
+		"portret"
+		"tresc";
+	padding-block: clamp(40px, 8vw, 64px) clamp(72px, 14vw, 112px);
+	overflow: clip;
+	background: var(--vs-jasne);
+	color: var(--vs-na-jasnym);
 }
 
-.vs-efekty__kafel {
-	position: relative;
-	min-width: 0;
-	margin: 0;
-	overflow: hidden;
-	background: color-mix(in srgb, var(--vs-ciemne) 6%, var(--vs-jasne));
-}
-
-.vs-efekty__kafel--duzy,
-.vs-efekty__kafel--pelny {
-	grid-column: span 2;
-	aspect-ratio: 4 / 3;
-}
-
-.vs-efekty__kafel--maly {
-	aspect-ratio: 4 / 5;
-}
-
-@media (min-width: 48rem) {
-	.vs-efekty__siatka {
-		grid-template-columns: minmax(0, 1fr) minmax(0, 0.618fr) minmax(0, 1fr);
-		gap: clamp(8px, 0.9vw, 14px);
-	}
-
-	.vs-efekty__kafel:nth-child(4n + 1) {
-		grid-column: 1 / span 2;
-	}
-
-	.vs-efekty__kafel:nth-child(4n + 2) {
-		grid-column: 3;
-	}
-
-	.vs-efekty__kafel:nth-child(4n + 3) {
-		grid-column: 1;
-	}
-
-	.vs-efekty__kafel:nth-child(4n + 4) {
-		grid-column: 2 / span 2;
-	}
-
-	.vs-efekty__kafel--duzy {
-		aspect-ratio: 724 / 370;
-	}
-
-	.vs-efekty__kafel--maly {
-		aspect-ratio: auto;
-	}
-
-	.vs-efekty__kafel--pelny {
-		grid-column: 1 / -1 !important;
-		aspect-ratio: 12 / 5;
-	}
-}
-
-/* Zdjęcie nie wpływa na wysokość kafla: rząd ma wysokość dużego kafla, mały się do niej dopasowuje. */
-.vs-efekty__zdjecie {
-	position: absolute;
-	inset: 0;
+/* Portret: na telefonie do prawej krawędzi, na tablecie nie większy niż 36 rem. */
+.vs-o-mnie__portret {
+	grid-area: portret;
+	justify-self: end;
+	width: min(100%, 36rem);
 	margin: 0;
 }
 
-.vs-efekty__zdjecie img {
-	position: absolute;
-	inset: 0;
+.vs-o-mnie__zdjecie {
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
+	height: auto;
 }
 
-/* Warstwa pod spodem: czarno-biała jak u Adriana (filtr stały, nic się na nim nie animuje). */
-.vs-efekty__czb {
-	filter: grayscale(1);
+/* „O mnie”: na telefonie na dole zdjęcia, lekko pod jego krawędzią (jak u Adriana na komputerze). */
+.vs-o-mnie__tytul {
+	position: relative;
+	z-index: 1;
+	grid-area: portret;
+	align-self: end;
+	justify-self: start;
+	margin: 0 0 -0.32em var(--vs-margines);
+	font-family: var(--wp--custom--font--odreczne);
+	font-size: clamp(3.5rem, 17.5vw, 7rem);
+	font-weight: 400;
+	line-height: 1;
+	color: var(--vs-akcent);
+	rotate: -6deg;
+	transform-origin: left bottom;
 }
 
-.vs-efekty__podpis {
-	position: absolute;
-	bottom: 12px;
-	left: 12px;
-	padding: 6px 10px;
-	background: color-mix(in srgb, var(--vs-jasne) 88%, transparent);
-	font-size: 11px;
+.vs-o-mnie__tresc {
+	grid-area: tresc;
+	width: min(100% - 2 * var(--vs-margines), 42rem);
+	margin: clamp(48px, 12vw, 80px) 0 0 var(--vs-margines);
+}
+
+/* Imię: pierwsze słowo Playfair kursywą, nazwisko Oswald wersalikami, jedno pod drugim. */
+.vs-o-mnie__imie {
+	display: grid;
+	justify-items: start;
+	margin: 0;
+	font-size: clamp(2.5rem, 3.05vw, 3.75rem);
+	line-height: 1.05;
+}
+
+.vs-o-mnie__imie-kursywa {
+	font-family: var(--wp--custom--font--kursywa);
+	font-style: italic;
 	font-weight: 500;
-	letter-spacing: 0.16em;
+	letter-spacing: -0.01em;
+}
+
+.vs-o-mnie__imie-wersaliki {
+	font-family: var(--wp--custom--font--naglowek);
+	font-weight: 500;
+	letter-spacing: -0.01em;
 	text-transform: uppercase;
 }
 
-/*
- * Ruch (zasada Igora: prosto, czysto, bez klatkowania): wjazd kafla robi wspólny mechanizm motywu
- * (data-vs-wjazd, assets/js/wjazd.js), a ta sekcja dokłada tylko „wywołanie” koloru: po wjeździe
- * warstwa kolorowa nabiera pełnej przezroczystości (1400 ms, ease), raz. Bez JavaScriptu: od razu kolor.
- */
-.vs-ruch .vs-efekty__kafel:not(.is-widoczny) .vs-efekty__kolor {
-	opacity: 0;
-}
-
-.vs-ruch .vs-efekty__kafel.is-widoczny .vs-efekty__kolor {
-	transition: opacity 1400ms ease;
-	transition-delay: calc(var(--vs-opoznienie, 0ms) + 650ms);
-}
-
-/* Mysz: lekkie przybliżenie po najechaniu (cała para warstw naraz, jedna warstwa graficzna). */
-.vs-efekty__zdjecie {
-	transition: scale 700ms var(--vs-ruch-wyjscie);
-}
-
-@media (hover: hover) and (pointer: fine) {
-	.vs-efekty__kafel:hover .vs-efekty__zdjecie {
-		scale: 1.03;
-	}
-}
-
-.vs-efekty__stopka {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px 24px;
-	margin-top: clamp(20px, 2.4vw, 36px);
-}
-
-.vs-efekty__uwaga {
-	margin: 0;
-	font-size: 12px;
+.vs-o-mnie__opis {
+	margin-top: clamp(28px, 2.9vw, 56px);
+	font-size: 1rem;
 	font-weight: 400;
-	letter-spacing: 0.04em;
-	opacity: 0.8;
+	line-height: 1.7;
 }
 
-.vs-efekty__rezerwacja {
-	min-height: 48px;
-	border-color: var(--vs-ciemne);
-	background: var(--vs-ciemne);
-	color: var(--vs-na-ciemnym);
-}
-
-@media (hover: hover) and (pointer: fine) {
-	.vs-efekty__rezerwacja:hover {
-		background: transparent;
-		color: var(--vs-ciemne);
-	}
-}
-
-/* Telefon: „Umów wizytę” jest w przyklejonym dolnym pasku (struktura 1.2: przycisk po sekcji tylko na komputerze). */
-@media (max-width: 63.99rem) {
-	.vs-efekty__rezerwacja {
-		display: none;
-	}
-}
-
-/*
- * Paralaksa w kaflach (scroll-craft „parallax”, plan ruchu Igora 20.10.2026): zdjęcie w ramce przesuwa się wolniej niż kafel,
- * więc galeria ma głębię; kolumny w różnym tempie (co drugi kafel 64 px zamiast 40 px). Ramka ma zapas na przesunięcie,
- * żeby w kaflu nigdy nie było pustego miejsca. Oś widoku kafla (CSS, wątek grafiki), translate na ramce, a przybliżenie
- * po najechaniu zostaje na scale. Bez osi widoku albo przy ograniczonym ruchu: zdjęcia stoją.
- */
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		.vs-efekty__kafel {
-			view-timeline: --vs-kafel block;
-		}
-
-		.vs-efekty__zdjecie {
-			inset: -40px 0;
-			animation: vs-efekty-paralaksa linear both;
-			animation-duration: auto;
-			animation-timeline: --vs-kafel;
-			animation-range: cover 0% cover 100%;
-		}
-
-		.vs-efekty__kafel:nth-child(even) .vs-efekty__zdjecie {
-			inset: -64px 0;
-			animation-name: vs-efekty-paralaksa-szybsza;
-		}
-	}
-}
-
-@keyframes vs-efekty-paralaksa {
-	from {
-		translate: 0 -40px;
-	}
-	to {
-		translate: 0 40px;
-	}
-}
-
-@keyframes vs-efekty-paralaksa-szybsza {
-	from {
-		translate: 0 -64px;
-	}
-	to {
-		translate: 0 64px;
-	}
-}
-
-/*
- * Odsłona od środka (wzór ever.co.id, pomiar 20.10.2026: zdjęcia otwierają się z pionowej kreski na środku,
- * clip-path inset(0 50% 0 50%) do pełnej ramki). U nas dwie zasłony w kolorze tła sekcji rozsuwają się na boki
- * (tylko scale, wątek grafiki), a zdjęcie w środku oddala się z 1,3 do 1. Wszystko na osi przewijania kafla:
- * kafel otwiera się pod palcem, w tempie przewijania, i zamyka, gdy wracamy w górę. Kafle w rzędzie startują
- * z różnych miejsc (co drugi później), więc para nie otwiera się jak jeden blok.
- * Wspólny wjazd kafla (opacity) przestaje być potrzebny; „wywołanie” koloru zostaje.
- */
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		.vs-ruch .vs-efekty__kafel[data-vs-wjazd] {
-			opacity: 1;
-			translate: none;
-		}
-
-		.vs-efekty__kafel::before,
-		.vs-efekty__kafel::after {
-			content: "";
-			position: absolute;
-			/* Zapas 2 px poza kafel (przycina go overflow): krawędź zasłony nigdy nie zostawia włosowej linii tła. */
-			inset-block: -2px;
-			z-index: 1;
-			width: calc(50% + 3px);
-			background: var(--vs-jasne);
-			pointer-events: none;
-			animation: vs-efekty-zaslona linear both;
-			animation-duration: auto;
-			animation-timeline: --vs-kafel;
-			animation-range: entry 5% cover 42%;
-		}
-
-		.vs-efekty__kafel::before {
-			left: -2px;
-			transform-origin: 0 50%;
-		}
-
-		.vs-efekty__kafel::after {
-			right: -2px;
-			transform-origin: 100% 50%;
-		}
-
-		.vs-efekty__zdjecie img {
-			animation: vs-efekty-oddalenie linear both;
-			animation-duration: auto;
-			animation-timeline: --vs-kafel;
-			animation-range: entry 0% cover 55%;
-		}
-
-		.vs-efekty__kafel:nth-child(even)::before,
-		.vs-efekty__kafel:nth-child(even)::after {
-			animation-range: entry 30% cover 50%;
-		}
-	}
-}
-
-@keyframes vs-efekty-zaslona {
-	to {
-		scale: 0 1;
-	}
-}
-
-@keyframes vs-efekty-oddalenie {
-	from {
-		scale: 1.3;
-	}
-}
-
-/*
- * Szablon 1 („Galeria” Adriana, pomiar projektu 1920 px): trzy zdjęcia 483 x 549 w rzędzie, odstęp 72 px (3,75%),
- * pod nimi „GALERIA” Gildą na całą szerokość: wersaliki 338 px, linia bazowa na krawędzi czarnej sekcji opinii,
- * zdjęcia zachodzą na górę liter o tyle, ile wynosi odstęp. Wymiary w cqi (szerokość sekcji), więc proporcje
- * są te same na każdym ekranie. Gilda przy interlinii 1: linia bazowa 0,8 em od góry wiersza, wersalik 0,7 em.
- */
-.vs-szablon-1 .vs-efekty {
-	container-type: inline-size;
-	display: flow-root;
-	isolation: isolate;
-	overflow: clip;
-	padding-block: clamp(48px, 5.6vw, 108px) 0;
-}
-
-.vs-szablon-1 .vs-efekty__wnetrze {
-	position: relative;
-	z-index: 1;
-}
-
-.vs-szablon-1 .vs-efekty__glowka {
-	display: block;
+.vs-o-mnie__opis p {
 	margin: 0;
+	text-wrap: pretty;
 }
 
-.vs-szablon-1 .vs-efekty__uwaga {
-	margin: 0 0 16px;
-	text-align: end;
+.vs-o-mnie__opis p + p {
+	margin-top: 1.7em;
 }
 
-.vs-szablon-1 .vs-efekty__kafel:nth-child(n) {
-	grid-column: auto;
-	aspect-ratio: 500 / 568;
+.vs-o-mnie__szkolenia {
+	display: grid;
+	gap: 8px;
+	margin: 32px 0 0;
+	padding: 18px 0 0;
+	list-style: none;
+	border-top: 1px solid color-mix(in srgb, var(--vs-na-jasnym) 25%, transparent);
+	font-size: 0.9375rem;
+	line-height: 1.5;
 }
 
-/* Telefon: pierwsze zdjęcie przez całą szerokość, pozostałe parami (bez przewijania w bok). */
-@media (max-width: 47.99rem) {
-	.vs-szablon-1 .vs-efekty__kafel:first-child,
-	.vs-szablon-1 .vs-efekty__kafel:last-child:nth-child(even) {
-		grid-column: 1 / -1;
+.vs-o-mnie__rok {
+	margin-inline-end: 0.75em;
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+}
+
+/* Komputer: układ Adriana. Tekst na środku wysokości, portret i „O mnie” przy dolnej krawędzi. */
+@media (min-width: 64rem) {
+	.vs-o-mnie {
+		display: grid;
+		grid-template-areas: "tresc";
+		align-content: center;
+		min-height: 56.25vw;
+		padding-block: clamp(80px, 30vw - 270px, 320px) calc(14.5vw + 16px);
+		padding-inline: 8.65vw 0;
 	}
-}
 
-@media (min-width: 48rem) {
-	.vs-szablon-1 .vs-efekty__wnetrze {
-		width: 82.97cqi;
+	.vs-o-mnie__portret {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: 47.4vw;
 	}
 
-	.vs-szablon-1 .vs-efekty__siatka {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 3.75cqi;
+	.vs-o-mnie__tytul {
+		position: absolute;
+		bottom: 3.3vw;
+		left: 42.3vw;
+		margin: 0;
+		font-size: 9.1vw;
+	}
+
+	.vs-o-mnie__tresc {
+		position: relative;
+		z-index: 1;
+		width: clamp(26rem, 35.2vw, 42rem);
+		margin: 0;
 	}
 }
 
 /*
- * Słowo: rozmiar z liczby znaków (GALERIA, 7 znaków: 25,2 % szerokości), wychodzi poza obie krawędzie jak u Adriana.
- * Środek przez flex: przy tekście szerszym niż sekcja text-align przestaje działać, a flex dzieli nadmiar na obie strony.
+ * Portret wyjeżdża z ramki (plan ruchu Igora 20.10.2026, mocniej po „nie ma fajnych efektów”): wycięta postać wstaje
+ * spod dolnej krawędzi (od 32% swojej wysokości niżej do 0) i dochodzi na miejsce, gdy sekcja jest na środku ekranu.
+ * Ruch w dół, więc ucięcie zdjęcia nigdy nie wychodzi nad krawędź; ramka przycina. Tekst obok wjeżdża z lewej. Oś widoku sekcji (CSS, wątek grafiki); bez niej albo przy ograniczonym ruchu portret stoi.
  */
-.vs-efekty__slowo {
-	position: relative;
-	z-index: 0;
-	display: flex;
-	justify-content: center;
-	margin-block: calc(-3.75cqi - 0.1em) -0.2em;
+.vs-o-mnie__portret {
+	overflow: clip;
+}
+
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-o-mnie {
+			view-timeline: --vs-o-mnie block;
+		}
+
+		.vs-o-mnie__zdjecie {
+			animation: vs-o-mnie-portret linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-o-mnie;
+			animation-range: cover 0% cover 50%;
+		}
+	}
+}
+
+@keyframes vs-o-mnie-portret {
+	from {
+		translate: 0 32%;
+	}
+	to {
+		translate: 0 0;
+	}
+}
+
+
+/* Imię, akapity i szkolenia wjeżdżają z lewej (ever.co.id: wiersze x -50 px), po kolei co 120 ms (wspólny wjazd). */
+.vs-ruch .vs-o-mnie__tresc [data-vs-wjazd]:not(.is-widoczny) {
+	translate: -56px 0;
+}
+
+/*
+ * Szablon 1 (czarno-biały Adriana, pomiar 1920 px, szablon-1.php): portret (wycięty PNG) z lewej, od 5,1 % szerokości,
+ * 36,4 % szerokości, stoi na dolnej krawędzi; imię Gildą wersalikami w dwóch wierszach (wersalik 41 px, interlinia 0,84)
+ * i akapity z prawej (od 54 %, kolumna 35,6 %); pod tekstem wielkie „O MNIE” od 43 % szerokości do prawej krawędzi,
+ * linia bazowa na krawędzi czarnego cennika. Wymiary dzieci w cqi (szerokość sekcji), siatka sekcji w procentach.
+ * Telefon: imię i tekst, pod nimi portret stojący na dolnej krawędzi, a na jego dole „O MNIE” białymi literami
+ * z mieszaniem „difference” (czarne na bieli, białe na czarnej marynarce), linia bazowa na krawędzi sekcji.
+ */
+.vs-szablon-1 .vs-o-mnie {
+	container-type: inline-size;
+	isolation: isolate;
+	grid-template-areas:
+		"tresc"
+		"dol";
+	padding-block: clamp(56px, 14vw, 96px) 0;
+}
+
+.vs-szablon-1 .vs-o-mnie__tresc {
+	grid-area: tresc;
+	width: auto;
+	max-width: 42rem;
+	margin: 0 var(--vs-margines);
+}
+
+/* Siatka, nie blok: ujemne marginesy wierszy (zapas na znaki nad wersalikami) w bloku zlewają się i rozsuwają wiersze. */
+.vs-szablon-1 .vs-o-mnie__imie {
+	display: grid;
+	justify-items: start;
 	font-family: var(--wp--custom--font--naglowek);
-	font-size: calc(176.4cqi / var(--ile, 7));
+	font-size: clamp(2rem, 3.05cqi, 3.75rem);
 	font-weight: 400;
 	letter-spacing: -0.01em;
+	line-height: 0.84;
+	text-transform: uppercase;
+}
+
+.vs-szablon-1 .vs-o-mnie__opis {
+	margin-top: clamp(24px, 2.1cqi, 40px);
+	font-size: 0.9375rem;
+	line-height: 1.65;
+}
+
+.vs-szablon-1 .vs-o-mnie__opis p + p {
+	margin-top: 1.65em;
+}
+
+.vs-szablon-1 .vs-o-mnie__portret {
+	grid-area: dol;
+	align-self: end;
+	justify-self: center;
+	width: min(84%, 26rem);
+	margin: 40px 0 0;
+}
+
+.vs-szablon-1 .vs-o-mnie__slowo {
+	position: relative;
+	z-index: 1;
+	grid-area: dol;
+	align-self: end;
+	display: flex;
+	justify-content: center;
+	margin-bottom: -0.2em;
+	font-family: var(--wp--custom--font--naglowek);
+	font-size: 26cqi;
+	font-weight: 400;
 	line-height: 1;
 	text-transform: uppercase;
 	white-space: nowrap;
-	color: var(--vs-ciemne);
+	color: var(--vs-jasne);
+	mix-blend-mode: difference;
 	-webkit-user-select: none;
 	user-select: none;
+	pointer-events: none;
 }
 
-.vs-efekty__litera {
+.vs-o-mnie__litera {
 	display: inline-block;
 }
 
+/* Imię wjeżdża literami (vs_litery, wspólny wjazd „tytul”), bez przesunięcia całego akapitu z lewej jak w szablonie 3. */
+.vs-ruch .vs-szablon-1 .vs-o-mnie__tresc [data-vs-wjazd="tytul"]:not(.is-widoczny) {
+	translate: none;
+}
+
+@media (min-width: 64rem) {
+	.vs-szablon-1 .vs-o-mnie {
+		grid-template-areas: none;
+		grid-template-columns:
+			5.1% [portret-start] 36.4% [portret-end] 1.6% [slowo-start] 11% [tresc-start] minmax(0, 35.6%)
+			[tresc-end] minmax(0, 1fr) [slowo-end];
+		grid-template-rows: auto auto;
+		align-content: stretch;
+		min-height: 0;
+		padding: 0;
+	}
+
+	.vs-szablon-1 .vs-o-mnie__tresc {
+		position: static;
+		grid-area: 1 / tresc;
+		align-self: start;
+		max-width: none;
+		margin: 0;
+		padding-top: 18.7cqi;
+	}
+
+	.vs-szablon-1 .vs-o-mnie__portret {
+		position: relative;
+		right: auto;
+		bottom: auto;
+		grid-area: 1 / portret / -1;
+		justify-self: stretch;
+		width: auto;
+		margin: 2.55cqi 0 -0.52cqi;
+	}
+
+	.vs-szablon-1 .vs-o-mnie__slowo {
+		grid-area: 2 / slowo;
+		justify-content: start;
+		font-size: 15.95cqi;
+		color: var(--vs-ciemne);
+		mix-blend-mode: normal;
+	}
+}
+
+/* Justowanie akapitów jak u Adriana tylko przy długim wierszu (od 1600 px), jak w cenniku. */
+@media (min-width: 100rem) {
+	.vs-szablon-1 .vs-o-mnie__opis {
+		font-size: 1rem;
+		line-height: 1.625;
+		text-align: justify;
+	}
+}
+
 /*
- * Ruch liter (scroll-craft „scrub”): każda litera wysuwa się spod dolnej krawędzi sekcji (maską jest overflow sekcji)
- * w tempie przewijania, od lewej, z przesunięciem 6 % osi na literę; kończą, zanim słowo dojdzie do 2/3 ekranu.
- * Tylko translate, wątek grafiki. Bez osi widoku albo przy ograniczonym ruchu: litery stoją na miejscu.
+ * Ruch szablonu 1: portret wstaje spod krawędzi (reguła szablonu 3 wyżej, oś widoku sekcji), a litery „O MNIE”
+ * zjeżdżają się z prawej w tempie przewijania (scroll-craft „scrub”, inny ruch niż litery GALERII, które wstają):
+ * każda litera startuje dalej w prawo (0,4 em + 0,3 em na literę), więc słowo „składa się” jak harmonijka.
+ * Tylko translate. Bez osi widoku albo przy ograniczonym ruchu litery stoją na miejscu.
  */
 @supports (animation-timeline: view()) {
 	@media (prefers-reduced-motion: no-preference) {
-		.vs-efekty__slowo {
-			view-timeline: --vs-slowo block;
+		.vs-o-mnie__slowo {
+			view-timeline: --vs-o-mnie-slowo block;
 		}
 
-		.vs-efekty__litera {
-			animation: vs-efekty-litera both;
+		.vs-o-mnie__litera {
+			animation: vs-o-mnie-litera both;
 			animation-timing-function: var(--vs-ruch-wyjscie);
 			animation-duration: auto;
-			animation-timeline: --vs-slowo;
-			animation-range: entry calc(var(--i, 0) * 6%) cover calc(25% + var(--i, 0) * 3%);
+			animation-timeline: --vs-o-mnie-slowo;
+			animation-range: entry 0% cover 45%;
 		}
 	}
 }
 
-@keyframes vs-efekty-litera {
+@keyframes vs-o-mnie-litera {
 	from {
-		translate: 0 0.8em;
+		translate: calc(0.4em + var(--i, 0) * 0.3em) 0;
 	}
 }
 </style>
@@ -2253,351 +2172,432 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 </style>
 <style>/*
- * O mnie (sekcja 07) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
- * tekst od 8,65% szerokości, kolumna 35,2%; portret (wycięty PNG) 47,4% szerokości przy prawej i dolnej krawędzi;
- * „O mnie” pismem Meddon, czerwone, od 36% szerokości, na dole, przed zdjęciem.
- * Telefon (struktura 1.2): portret z „O mnie” na dole zdjęcia, pod nim imię i tekst.
- * Typografia (better-typography): akapity 16 px w grubości 400, miara do ok. 76 znaków; u Adriana 15 px light,
- * justowane (jak w cenniku: do potwierdzenia z Adrianem). Kolor tekstu z palety (bordo), nie czarny.
- * Ruch: wspólny wjazd (data-vs-wjazd), ten sam rytm co reszta strony.
+ * Efekty: „Moje prace” Adriana (szablon 3). Para zdjęć w złotym podziale: duże : małe = 1,618 : 1,
+ * w drugim rzędzie odwrotnie. Siatka 1fr 0,618fr 1fr daje obie pary w jednym układzie.
+ * Zdjęcie wjeżdża czarno-białe (jak u Adriana) i samo „wywołuje się” w kolorze, raz, na każdym ekranie.
  */
 
-.vs-o-mnie {
-	position: relative;
-	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	grid-template-areas:
-		"portret"
-		"tresc";
-	padding-block: clamp(40px, 8vw, 64px) clamp(72px, 14vw, 112px);
-	overflow: clip;
+.vs-efekty {
+	padding-block: clamp(72px, 9vw, 150px);
 	background: var(--vs-jasne);
-	color: var(--vs-na-jasnym);
+	color: var(--vs-ciemne);
 }
 
-/* Portret: na telefonie do prawej krawędzi, na tablecie nie większy niż 36 rem. */
-.vs-o-mnie__portret {
-	grid-area: portret;
-	justify-self: end;
-	width: min(100%, 36rem);
-	margin: 0;
+.vs-efekty__wnetrze {
+	width: min(100% - 2 * var(--vs-margines), 1580px);
+	margin-inline: auto;
 }
 
-.vs-o-mnie__zdjecie {
-	width: 100%;
-	height: auto;
+@media (min-width: 64rem) {
+	.vs-efekty__wnetrze {
+		width: min(100% - 2 * var(--vs-margines), 82.3vw, 1580px);
+	}
 }
 
-/* „O mnie”: na telefonie na dole zdjęcia, lekko pod jego krawędzią (jak u Adriana na komputerze). */
-.vs-o-mnie__tytul {
-	position: relative;
-	z-index: 1;
-	grid-area: portret;
-	align-self: end;
-	justify-self: start;
-	margin: 0 0 -0.32em var(--vs-margines);
-	font-family: var(--wp--custom--font--odreczne);
-	font-size: clamp(3.5rem, 17.5vw, 7rem);
-	font-weight: 400;
-	line-height: 1;
-	color: var(--vs-akcent);
-	rotate: -6deg;
-	transform-origin: left bottom;
+.vs-efekty__glowka {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px 32px;
+	margin-bottom: clamp(20px, 2.4vw, 36px);
 }
 
-.vs-o-mnie__tresc {
-	grid-area: tresc;
-	width: min(100% - 2 * var(--vs-margines), 42rem);
-	margin: clamp(48px, 12vw, 80px) 0 0 var(--vs-margines);
-}
-
-/* Imię: pierwsze słowo Playfair kursywą, nazwisko Oswald wersalikami, jedno pod drugim. */
-.vs-o-mnie__imie {
-	display: grid;
-	justify-items: start;
-	margin: 0;
-	font-size: clamp(2.5rem, 3.05vw, 3.75rem);
-	line-height: 1.05;
-}
-
-.vs-o-mnie__imie-kursywa {
-	font-family: var(--wp--custom--font--kursywa);
-	font-style: italic;
-	font-weight: 500;
-	letter-spacing: -0.01em;
-}
-
-.vs-o-mnie__imie-wersaliki {
+.vs-efekty__tytul {
+	order: 2;
+	margin: 0 -0.5em 0 auto;
 	font-family: var(--wp--custom--font--naglowek);
+	font-size: clamp(14px, 1.15vw, 19px);
 	font-weight: 500;
-	letter-spacing: -0.01em;
+	letter-spacing: 0.5em;
+	line-height: 1.2;
 	text-transform: uppercase;
 }
 
-.vs-o-mnie__opis {
-	margin-top: clamp(28px, 2.9vw, 56px);
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.7;
-}
-
-.vs-o-mnie__opis p {
+.vs-efekty__opis {
+	order: 1;
+	max-width: 46ch;
 	margin: 0;
-	text-wrap: pretty;
+	font-size: 15px;
+	font-weight: 400;
+	line-height: 1.6;
 }
 
-.vs-o-mnie__opis p + p {
-	margin-top: 1.7em;
-}
-
-.vs-o-mnie__szkolenia {
+/* Siatka: telefon 2 kolumny (duże przez całą szerokość), od tabletu złoty podział. */
+.vs-efekty__siatka {
+	position: relative;
 	display: grid;
+	grid-template-columns: 1fr 1fr;
 	gap: 8px;
-	margin: 32px 0 0;
-	padding: 18px 0 0;
+	margin: 0;
+	padding: 0;
 	list-style: none;
-	border-top: 1px solid color-mix(in srgb, var(--vs-na-jasnym) 25%, transparent);
-	font-size: 0.9375rem;
-	line-height: 1.5;
 }
 
-.vs-o-mnie__rok {
-	margin-inline-end: 0.75em;
-	font-variant-numeric: tabular-nums;
+.vs-efekty__kafel {
+	position: relative;
+	min-width: 0;
+	margin: 0;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--vs-ciemne) 6%, var(--vs-jasne));
+}
+
+.vs-efekty__kafel--duzy,
+.vs-efekty__kafel--pelny {
+	grid-column: span 2;
+	aspect-ratio: 4 / 3;
+}
+
+.vs-efekty__kafel--maly {
+	aspect-ratio: 4 / 5;
+}
+
+@media (min-width: 48rem) {
+	.vs-efekty__siatka {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 0.618fr) minmax(0, 1fr);
+		gap: clamp(8px, 0.9vw, 14px);
+	}
+
+	.vs-efekty__kafel:nth-child(4n + 1) {
+		grid-column: 1 / span 2;
+	}
+
+	.vs-efekty__kafel:nth-child(4n + 2) {
+		grid-column: 3;
+	}
+
+	.vs-efekty__kafel:nth-child(4n + 3) {
+		grid-column: 1;
+	}
+
+	.vs-efekty__kafel:nth-child(4n + 4) {
+		grid-column: 2 / span 2;
+	}
+
+	.vs-efekty__kafel--duzy {
+		aspect-ratio: 724 / 370;
+	}
+
+	.vs-efekty__kafel--maly {
+		aspect-ratio: auto;
+	}
+
+	.vs-efekty__kafel--pelny {
+		grid-column: 1 / -1 !important;
+		aspect-ratio: 12 / 5;
+	}
+}
+
+/* Zdjęcie nie wpływa na wysokość kafla: rząd ma wysokość dużego kafla, mały się do niej dopasowuje. */
+.vs-efekty__zdjecie {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+}
+
+.vs-efekty__zdjecie img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Warstwa pod spodem: czarno-biała jak u Adriana (filtr stały, nic się na nim nie animuje). */
+.vs-efekty__czb {
+	filter: grayscale(1);
+}
+
+.vs-efekty__podpis {
+	position: absolute;
+	bottom: 12px;
+	left: 12px;
+	padding: 6px 10px;
+	background: color-mix(in srgb, var(--vs-jasne) 88%, transparent);
+	font-size: 11px;
 	font-weight: 500;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
 }
 
-/* Komputer: układ Adriana. Tekst na środku wysokości, portret i „O mnie” przy dolnej krawędzi. */
-@media (min-width: 64rem) {
-	.vs-o-mnie {
-		display: grid;
-		grid-template-areas: "tresc";
-		align-content: center;
-		min-height: 56.25vw;
-		padding-block: clamp(80px, 30vw - 270px, 320px) calc(14.5vw + 16px);
-		padding-inline: 8.65vw 0;
-	}
+/*
+ * Ruch (zasada Igora: prosto, czysto, bez klatkowania): wjazd kafla robi wspólny mechanizm motywu
+ * (data-vs-wjazd, assets/js/wjazd.js), a ta sekcja dokłada tylko „wywołanie” koloru: po wjeździe
+ * warstwa kolorowa nabiera pełnej przezroczystości (1400 ms, ease), raz. Bez JavaScriptu: od razu kolor.
+ */
+.vs-ruch .vs-efekty__kafel:not(.is-widoczny) .vs-efekty__kolor {
+	opacity: 0;
+}
 
-	.vs-o-mnie__portret {
-		position: absolute;
-		right: 0;
-		bottom: 0;
-		width: 47.4vw;
-	}
+.vs-ruch .vs-efekty__kafel.is-widoczny .vs-efekty__kolor {
+	transition: opacity 1400ms ease;
+	transition-delay: calc(var(--vs-opoznienie, 0ms) + 650ms);
+}
 
-	.vs-o-mnie__tytul {
-		position: absolute;
-		bottom: 3.3vw;
-		left: 42.3vw;
-		margin: 0;
-		font-size: 9.1vw;
-	}
+/* Mysz: lekkie przybliżenie po najechaniu (cała para warstw naraz, jedna warstwa graficzna). */
+.vs-efekty__zdjecie {
+	transition: scale 700ms var(--vs-ruch-wyjscie);
+}
 
-	.vs-o-mnie__tresc {
-		position: relative;
-		z-index: 1;
-		width: clamp(26rem, 35.2vw, 42rem);
-		margin: 0;
+@media (hover: hover) and (pointer: fine) {
+	.vs-efekty__kafel:hover .vs-efekty__zdjecie {
+		scale: 1.03;
+	}
+}
+
+.vs-efekty__stopka {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px 24px;
+	margin-top: clamp(20px, 2.4vw, 36px);
+}
+
+.vs-efekty__uwaga {
+	margin: 0;
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	opacity: 0.8;
+}
+
+.vs-efekty__rezerwacja {
+	min-height: 48px;
+	border-color: var(--vs-ciemne);
+	background: var(--vs-ciemne);
+	color: var(--vs-na-ciemnym);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.vs-efekty__rezerwacja:hover {
+		background: transparent;
+		color: var(--vs-ciemne);
+	}
+}
+
+/* Telefon: „Umów wizytę” jest w przyklejonym dolnym pasku (struktura 1.2: przycisk po sekcji tylko na komputerze). */
+@media (max-width: 63.99rem) {
+	.vs-efekty__rezerwacja {
+		display: none;
 	}
 }
 
 /*
- * Portret wyjeżdża z ramki (plan ruchu Igora 20.10.2026, mocniej po „nie ma fajnych efektów”): wycięta postać wstaje
- * spod dolnej krawędzi (od 32% swojej wysokości niżej do 0) i dochodzi na miejsce, gdy sekcja jest na środku ekranu.
- * Ruch w dół, więc ucięcie zdjęcia nigdy nie wychodzi nad krawędź; ramka przycina. Tekst obok wjeżdża z lewej. Oś widoku sekcji (CSS, wątek grafiki); bez niej albo przy ograniczonym ruchu portret stoi.
+ * Paralaksa w kaflach (scroll-craft „parallax”, plan ruchu Igora 20.10.2026): zdjęcie w ramce przesuwa się wolniej niż kafel,
+ * więc galeria ma głębię; kolumny w różnym tempie (co drugi kafel 64 px zamiast 40 px). Ramka ma zapas na przesunięcie,
+ * żeby w kaflu nigdy nie było pustego miejsca. Oś widoku kafla (CSS, wątek grafiki), translate na ramce, a przybliżenie
+ * po najechaniu zostaje na scale. Bez osi widoku albo przy ograniczonym ruchu: zdjęcia stoją.
  */
-.vs-o-mnie__portret {
-	overflow: clip;
-}
-
 @supports (animation-timeline: view()) {
 	@media (prefers-reduced-motion: no-preference) {
-		.vs-o-mnie {
-			view-timeline: --vs-o-mnie block;
+		.vs-efekty__kafel {
+			view-timeline: --vs-kafel block;
 		}
 
-		.vs-o-mnie__zdjecie {
-			animation: vs-o-mnie-portret linear both;
+		.vs-efekty__zdjecie {
+			inset: -40px 0;
+			animation: vs-efekty-paralaksa linear both;
 			animation-duration: auto;
-			animation-timeline: --vs-o-mnie;
-			animation-range: cover 0% cover 50%;
+			animation-timeline: --vs-kafel;
+			animation-range: cover 0% cover 100%;
+		}
+
+		.vs-efekty__kafel:nth-child(even) .vs-efekty__zdjecie {
+			inset: -64px 0;
+			animation-name: vs-efekty-paralaksa-szybsza;
 		}
 	}
 }
 
-@keyframes vs-o-mnie-portret {
+@keyframes vs-efekty-paralaksa {
 	from {
-		translate: 0 32%;
+		translate: 0 -40px;
 	}
 	to {
-		translate: 0 0;
+		translate: 0 40px;
 	}
 }
 
-
-/* Imię, akapity i szkolenia wjeżdżają z lewej (ever.co.id: wiersze x -50 px), po kolei co 120 ms (wspólny wjazd). */
-.vs-ruch .vs-o-mnie__tresc [data-vs-wjazd]:not(.is-widoczny) {
-	translate: -56px 0;
+@keyframes vs-efekty-paralaksa-szybsza {
+	from {
+		translate: 0 -64px;
+	}
+	to {
+		translate: 0 64px;
+	}
 }
 
 /*
- * Szablon 1 (czarno-biały Adriana, pomiar 1920 px, szablon-1.php): portret (wycięty PNG) z lewej, od 5,1 % szerokości,
- * 36,4 % szerokości, stoi na dolnej krawędzi; imię Gildą wersalikami w dwóch wierszach (wersalik 41 px, interlinia 0,84)
- * i akapity z prawej (od 54 %, kolumna 35,6 %); pod tekstem wielkie „O MNIE” od 43 % szerokości do prawej krawędzi,
- * linia bazowa na krawędzi czarnego cennika. Wymiary dzieci w cqi (szerokość sekcji), siatka sekcji w procentach.
- * Telefon: imię i tekst, pod nimi portret stojący na dolnej krawędzi, a na jego dole „O MNIE” białymi literami
- * z mieszaniem „difference” (czarne na bieli, białe na czarnej marynarce), linia bazowa na krawędzi sekcji.
+ * Odsłona od środka (wzór ever.co.id, pomiar 20.10.2026: zdjęcia otwierają się z pionowej kreski na środku,
+ * clip-path inset(0 50% 0 50%) do pełnej ramki). U nas dwie zasłony w kolorze tła sekcji rozsuwają się na boki
+ * (tylko scale, wątek grafiki), a zdjęcie w środku oddala się z 1,3 do 1. Wszystko na osi przewijania kafla:
+ * kafel otwiera się pod palcem, w tempie przewijania, i zamyka, gdy wracamy w górę. Kafle w rzędzie startują
+ * z różnych miejsc (co drugi później), więc para nie otwiera się jak jeden blok.
+ * Wspólny wjazd kafla (opacity) przestaje być potrzebny; „wywołanie” koloru zostaje.
  */
-.vs-szablon-1 .vs-o-mnie {
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-ruch .vs-efekty__kafel[data-vs-wjazd] {
+			opacity: 1;
+			translate: none;
+		}
+
+		.vs-efekty__kafel::before,
+		.vs-efekty__kafel::after {
+			content: "";
+			position: absolute;
+			/* Zapas 2 px poza kafel (przycina go overflow): krawędź zasłony nigdy nie zostawia włosowej linii tła. */
+			inset-block: -2px;
+			z-index: 1;
+			width: calc(50% + 3px);
+			background: var(--vs-jasne);
+			pointer-events: none;
+			animation: vs-efekty-zaslona linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-kafel;
+			animation-range: entry 5% cover 42%;
+		}
+
+		.vs-efekty__kafel::before {
+			left: -2px;
+			transform-origin: 0 50%;
+		}
+
+		.vs-efekty__kafel::after {
+			right: -2px;
+			transform-origin: 100% 50%;
+		}
+
+		.vs-efekty__zdjecie img {
+			animation: vs-efekty-oddalenie linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-kafel;
+			animation-range: entry 0% cover 55%;
+		}
+
+		.vs-efekty__kafel:nth-child(even)::before,
+		.vs-efekty__kafel:nth-child(even)::after {
+			animation-range: entry 30% cover 50%;
+		}
+	}
+}
+
+@keyframes vs-efekty-zaslona {
+	to {
+		scale: 0 1;
+	}
+}
+
+@keyframes vs-efekty-oddalenie {
+	from {
+		scale: 1.3;
+	}
+}
+
+/*
+ * Szablon 1 („Galeria” Adriana, pomiar projektu 1920 px): trzy zdjęcia 483 x 549 w rzędzie, odstęp 72 px (3,75%),
+ * pod nimi „GALERIA” Gildą na całą szerokość: wersaliki 338 px, linia bazowa na krawędzi czarnej sekcji opinii,
+ * zdjęcia zachodzą na górę liter o tyle, ile wynosi odstęp. Wymiary w cqi (szerokość sekcji), więc proporcje
+ * są te same na każdym ekranie. Gilda przy interlinii 1: linia bazowa 0,8 em od góry wiersza, wersalik 0,7 em.
+ */
+.vs-szablon-1 .vs-efekty {
 	container-type: inline-size;
+	display: flow-root;
 	isolation: isolate;
-	grid-template-areas:
-		"tresc"
-		"dol";
-	padding-block: clamp(56px, 14vw, 96px) 0;
+	overflow: clip;
+	padding-block: clamp(48px, 5.6vw, 108px) 0;
 }
 
-.vs-szablon-1 .vs-o-mnie__tresc {
-	grid-area: tresc;
-	width: auto;
-	max-width: 42rem;
-	margin: 0 var(--vs-margines);
-}
-
-/* Siatka, nie blok: ujemne marginesy wierszy (zapas na znaki nad wersalikami) w bloku zlewają się i rozsuwają wiersze. */
-.vs-szablon-1 .vs-o-mnie__imie {
-	display: grid;
-	justify-items: start;
-	font-family: var(--wp--custom--font--naglowek);
-	font-size: clamp(2rem, 3.05cqi, 3.75rem);
-	font-weight: 400;
-	letter-spacing: -0.01em;
-	line-height: 0.84;
-	text-transform: uppercase;
-}
-
-.vs-szablon-1 .vs-o-mnie__opis {
-	margin-top: clamp(24px, 2.1cqi, 40px);
-	font-size: 0.9375rem;
-	line-height: 1.65;
-}
-
-.vs-szablon-1 .vs-o-mnie__opis p + p {
-	margin-top: 1.65em;
-}
-
-.vs-szablon-1 .vs-o-mnie__portret {
-	grid-area: dol;
-	align-self: end;
-	justify-self: center;
-	width: min(84%, 26rem);
-	margin: 40px 0 0;
-}
-
-.vs-szablon-1 .vs-o-mnie__slowo {
+.vs-szablon-1 .vs-efekty__wnetrze {
 	position: relative;
 	z-index: 1;
-	grid-area: dol;
-	align-self: end;
+}
+
+.vs-szablon-1 .vs-efekty__glowka {
+	display: block;
+	margin: 0;
+}
+
+.vs-szablon-1 .vs-efekty__uwaga {
+	margin: 0 0 16px;
+	text-align: end;
+}
+
+.vs-szablon-1 .vs-efekty__kafel:nth-child(n) {
+	grid-column: auto;
+	aspect-ratio: 500 / 568;
+}
+
+/* Telefon: pierwsze zdjęcie przez całą szerokość, pozostałe parami (bez przewijania w bok). */
+@media (max-width: 47.99rem) {
+	.vs-szablon-1 .vs-efekty__kafel:first-child,
+	.vs-szablon-1 .vs-efekty__kafel:last-child:nth-child(even) {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (min-width: 48rem) {
+	.vs-szablon-1 .vs-efekty__wnetrze {
+		width: 82.97cqi;
+	}
+
+	.vs-szablon-1 .vs-efekty__siatka {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 3.75cqi;
+	}
+}
+
+/*
+ * Słowo: rozmiar z liczby znaków (GALERIA, 7 znaków: 25,2 % szerokości), wychodzi poza obie krawędzie jak u Adriana.
+ * Środek przez flex: przy tekście szerszym niż sekcja text-align przestaje działać, a flex dzieli nadmiar na obie strony.
+ */
+.vs-efekty__slowo {
+	position: relative;
+	z-index: 0;
 	display: flex;
 	justify-content: center;
-	margin-bottom: -0.2em;
+	margin-block: calc(-3.75cqi - 0.1em) -0.2em;
 	font-family: var(--wp--custom--font--naglowek);
-	font-size: 26cqi;
+	font-size: calc(176.4cqi / var(--ile, 7));
 	font-weight: 400;
+	letter-spacing: -0.01em;
 	line-height: 1;
 	text-transform: uppercase;
 	white-space: nowrap;
-	color: var(--vs-jasne);
-	mix-blend-mode: difference;
+	color: var(--vs-ciemne);
 	-webkit-user-select: none;
 	user-select: none;
-	pointer-events: none;
 }
 
-.vs-o-mnie__litera {
+.vs-efekty__litera {
 	display: inline-block;
 }
 
-/* Imię wjeżdża literami (vs_litery, wspólny wjazd „tytul”), bez przesunięcia całego akapitu z lewej jak w szablonie 3. */
-.vs-ruch .vs-szablon-1 .vs-o-mnie__tresc [data-vs-wjazd="tytul"]:not(.is-widoczny) {
-	translate: none;
-}
-
-@media (min-width: 64rem) {
-	.vs-szablon-1 .vs-o-mnie {
-		grid-template-areas: none;
-		grid-template-columns:
-			5.1% [portret-start] 36.4% [portret-end] 1.6% [slowo-start] 11% [tresc-start] minmax(0, 35.6%)
-			[tresc-end] minmax(0, 1fr) [slowo-end];
-		grid-template-rows: auto auto;
-		align-content: stretch;
-		min-height: 0;
-		padding: 0;
-	}
-
-	.vs-szablon-1 .vs-o-mnie__tresc {
-		position: static;
-		grid-area: 1 / tresc;
-		align-self: start;
-		max-width: none;
-		margin: 0;
-		padding-top: 18.7cqi;
-	}
-
-	.vs-szablon-1 .vs-o-mnie__portret {
-		position: relative;
-		right: auto;
-		bottom: auto;
-		grid-area: 1 / portret / -1;
-		justify-self: stretch;
-		width: auto;
-		margin: 2.55cqi 0 -0.52cqi;
-	}
-
-	.vs-szablon-1 .vs-o-mnie__slowo {
-		grid-area: 2 / slowo;
-		justify-content: start;
-		font-size: 15.95cqi;
-		color: var(--vs-ciemne);
-		mix-blend-mode: normal;
-	}
-}
-
-/* Justowanie akapitów jak u Adriana tylko przy długim wierszu (od 1600 px), jak w cenniku. */
-@media (min-width: 100rem) {
-	.vs-szablon-1 .vs-o-mnie__opis {
-		font-size: 1rem;
-		line-height: 1.625;
-		text-align: justify;
-	}
-}
-
 /*
- * Ruch szablonu 1: portret wstaje spod krawędzi (reguła szablonu 3 wyżej, oś widoku sekcji), a litery „O MNIE”
- * zjeżdżają się z prawej w tempie przewijania (scroll-craft „scrub”, inny ruch niż litery GALERII, które wstają):
- * każda litera startuje dalej w prawo (0,4 em + 0,3 em na literę), więc słowo „składa się” jak harmonijka.
- * Tylko translate. Bez osi widoku albo przy ograniczonym ruchu litery stoją na miejscu.
+ * Ruch liter (scroll-craft „scrub”): każda litera wysuwa się spod dolnej krawędzi sekcji (maską jest overflow sekcji)
+ * w tempie przewijania, od lewej, z przesunięciem 6 % osi na literę; kończą, zanim słowo dojdzie do 2/3 ekranu.
+ * Tylko translate, wątek grafiki. Bez osi widoku albo przy ograniczonym ruchu: litery stoją na miejscu.
  */
 @supports (animation-timeline: view()) {
 	@media (prefers-reduced-motion: no-preference) {
-		.vs-o-mnie__slowo {
-			view-timeline: --vs-o-mnie-slowo block;
+		.vs-efekty__slowo {
+			view-timeline: --vs-slowo block;
 		}
 
-		.vs-o-mnie__litera {
-			animation: vs-o-mnie-litera both;
+		.vs-efekty__litera {
+			animation: vs-efekty-litera both;
 			animation-timing-function: var(--vs-ruch-wyjscie);
 			animation-duration: auto;
-			animation-timeline: --vs-o-mnie-slowo;
-			animation-range: entry 0% cover 45%;
+			animation-timeline: --vs-slowo;
+			animation-range: entry calc(var(--i, 0) * 6%) cover calc(25% + var(--i, 0) * 3%);
 		}
 	}
 }
 
-@keyframes vs-o-mnie-litera {
+@keyframes vs-efekty-litera {
 	from {
-		translate: calc(0.4em + var(--i, 0) * 0.3em) 0;
+		translate: 0 0.8em;
 	}
 }
 </style>
@@ -6152,33 +6152,30 @@ if ( czekajace.size ) {
 	</section>
 
 
-<section class="vs-efekty wp-block-visual-scale-efekty" id="efekty" aria-labelledby="vs-efekty-tytul" data-vs-efekty>
-	<div class="vs-efekty__wnetrze">
-		<div class="vs-efekty__glowka">
-			<h2 class="vs-ukryte" id="vs-efekty-tytul">Galeria</h2>
-								</div>
+<section class="vs-o-mnie wp-block-visual-scale-o-mnie" id="o-mnie" aria-labelledby="vs-o-mnie-tytul">
+	<h2 class="vs-ukryte" id="vs-o-mnie-tytul">O mnie</h2>
 
-		<ul class="vs-efekty__siatka" role="list">
-											<li class="vs-efekty__kafel" data-vs-wjazd>
-					<figure class="vs-efekty__zdjecie">
-						<img width="500" height="568" src="media/praca-1.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-1.webp" class="vs-efekty__kolor" alt="Zbliżenie twarzy z gładką, promienną skórą i podkreślonymi brwiami" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
-				</li>
-											<li class="vs-efekty__kafel" data-vs-wjazd>
-					<figure class="vs-efekty__zdjecie">
-						<img width="500" height="568" src="media/praca-2.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-2.webp" class="vs-efekty__kolor" alt="Zbliżenie nawilżonych ust" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
-				</li>
-											<li class="vs-efekty__kafel" data-vs-wjazd>
-					<figure class="vs-efekty__zdjecie">
-						<img width="500" height="568" src="media/praca-3.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-3.webp" class="vs-efekty__kolor" alt="Zabieg oczyszczania skóry twarzy urządzeniem, klientka z zamkniętymi oczami" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
-				</li>
-					</ul>
+	<div class="vs-o-mnie__tresc">
+					<p class="vs-o-mnie__imie" data-vs-wjazd="tytul">
+									<span class="vs-tytul__wiersz"><span class="vs-tytul__glowna"><span class="vs-ukryte">Marta</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">M</span><span class="vs-litera" style="--i: 1">a</span><span class="vs-litera" style="--i: 2">r</span><span class="vs-litera" style="--i: 3">t</span><span class="vs-litera" style="--i: 4">a</span></span></span></span></span>
+														<span class="vs-tytul__wiersz"><span class="vs-tytul__glowna"><span class="vs-ukryte">Majewska</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 5">M</span><span class="vs-litera" style="--i: 6">a</span><span class="vs-litera" style="--i: 7">j</span><span class="vs-litera" style="--i: 8">e</span><span class="vs-litera" style="--i: 9">w</span><span class="vs-litera" style="--i: 10">s</span><span class="vs-litera" style="--i: 11">k</span><span class="vs-litera" style="--i: 12">a</span></span></span></span></span>
+												</p>
+		
+		<div class="vs-o-mnie__opis" data-vs-wjazd>
+							<p>Pomagam podkreślać naturalne piękno i świadomie dbać o skórę. W mojej pracy łączę wiedzę, precyzję i wyczucie estetyki, dobierając pielęgnację do Twoich potrzeb.</p>
+							<p>Zależy mi, abyś czuła się tu swobodnie i wiedziała, czego możesz się spodziewać. Dlatego zaczynam od rozmowy: poznaję Twoje oczekiwania, odpowiadam na pytania i wspólnie ustalamy plan działania.</p>
+					</div>
 
 			</div>
-					<div class="vs-efekty__slowo" aria-hidden="true" style="--ile: 7">
-			<span class="vs-efekty__litery">
-				<span class="vs-efekty__litera" style="--i: 0">G</span><span class="vs-efekty__litera" style="--i: 1">a</span><span class="vs-efekty__litera" style="--i: 2">l</span><span class="vs-efekty__litera" style="--i: 3">e</span><span class="vs-efekty__litera" style="--i: 4">r</span><span class="vs-efekty__litera" style="--i: 5">i</span><span class="vs-efekty__litera" style="--i: 6">a</span>			</span>
-		</div>
-	</section>
+
+			<figure class="vs-o-mnie__portret">
+			<img width="738" height="1100" src="media/o-mnie.webp" class="vs-o-mnie__zdjecie" alt="Marta Majewska w czarnej marynarce, z dłonią przy uchu, uśmiechnięta" loading="lazy" decoding="async" />		</figure>
+	
+	<div class="vs-o-mnie__slowo" aria-hidden="true">
+		<span class="vs-o-mnie__litery">
+			<span class="vs-o-mnie__litera" style="--i: 0">O</span> <span class="vs-o-mnie__litera" style="--i: 1">m</span><span class="vs-o-mnie__litera" style="--i: 2">n</span><span class="vs-o-mnie__litera" style="--i: 3">i</span><span class="vs-o-mnie__litera" style="--i: 4">e</span>		</span>
+	</div>
+</section>
 
 
 <section class="vs-cennik wp-block-visual-scale-cennik" id="cennik" aria-labelledby="vs-cennik-tytul">
@@ -6262,30 +6259,33 @@ if ( czekajace.size ) {
 </section>
 
 
-<section class="vs-o-mnie wp-block-visual-scale-o-mnie" id="o-mnie" aria-labelledby="vs-o-mnie-tytul">
-	<h2 class="vs-ukryte" id="vs-o-mnie-tytul">O mnie</h2>
+<section class="vs-efekty wp-block-visual-scale-efekty" id="efekty" aria-labelledby="vs-efekty-tytul" data-vs-efekty>
+	<div class="vs-efekty__wnetrze">
+		<div class="vs-efekty__glowka">
+			<h2 class="vs-ukryte" id="vs-efekty-tytul">Galeria</h2>
+								</div>
 
-	<div class="vs-o-mnie__tresc">
-					<p class="vs-o-mnie__imie" data-vs-wjazd="tytul">
-									<span class="vs-tytul__wiersz"><span class="vs-tytul__glowna"><span class="vs-ukryte">Marta</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">M</span><span class="vs-litera" style="--i: 1">a</span><span class="vs-litera" style="--i: 2">r</span><span class="vs-litera" style="--i: 3">t</span><span class="vs-litera" style="--i: 4">a</span></span></span></span></span>
-														<span class="vs-tytul__wiersz"><span class="vs-tytul__glowna"><span class="vs-ukryte">Majewska</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 5">M</span><span class="vs-litera" style="--i: 6">a</span><span class="vs-litera" style="--i: 7">j</span><span class="vs-litera" style="--i: 8">e</span><span class="vs-litera" style="--i: 9">w</span><span class="vs-litera" style="--i: 10">s</span><span class="vs-litera" style="--i: 11">k</span><span class="vs-litera" style="--i: 12">a</span></span></span></span></span>
-												</p>
-		
-		<div class="vs-o-mnie__opis" data-vs-wjazd>
-							<p>Pomagam podkreślać naturalne piękno i świadomie dbać o skórę. W mojej pracy łączę wiedzę, precyzję i wyczucie estetyki, dobierając pielęgnację do Twoich potrzeb.</p>
-							<p>Zależy mi, abyś czuła się tu swobodnie i wiedziała, czego możesz się spodziewać. Dlatego zaczynam od rozmowy: poznaję Twoje oczekiwania, odpowiadam na pytania i wspólnie ustalamy plan działania.</p>
-					</div>
+		<ul class="vs-efekty__siatka" role="list">
+											<li class="vs-efekty__kafel" data-vs-wjazd>
+					<figure class="vs-efekty__zdjecie">
+						<img width="500" height="568" src="media/praca-1.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-1.webp" class="vs-efekty__kolor" alt="Zbliżenie twarzy z gładką, promienną skórą i podkreślonymi brwiami" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
+				</li>
+											<li class="vs-efekty__kafel" data-vs-wjazd>
+					<figure class="vs-efekty__zdjecie">
+						<img width="500" height="568" src="media/praca-2.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-2.webp" class="vs-efekty__kolor" alt="Zbliżenie nawilżonych ust" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
+				</li>
+											<li class="vs-efekty__kafel" data-vs-wjazd>
+					<figure class="vs-efekty__zdjecie">
+						<img width="500" height="568" src="media/praca-3.webp" class="vs-efekty__czb" alt="" loading="lazy" decoding="async" style="object-position: 50% 50%" aria-hidden="true" /><img width="500" height="568" src="media/praca-3.webp" class="vs-efekty__kolor" alt="Zabieg oczyszczania skóry twarzy urządzeniem, klientka z zamkniętymi oczami" loading="lazy" decoding="async" style="object-position: 50% 50%" />											</figure>
+				</li>
+					</ul>
 
 			</div>
-
-			<figure class="vs-o-mnie__portret">
-			<img width="738" height="1100" src="media/o-mnie.webp" class="vs-o-mnie__zdjecie" alt="Marta Majewska w czarnej marynarce, z dłonią przy uchu, uśmiechnięta" loading="lazy" decoding="async" />		</figure>
-	
-	<div class="vs-o-mnie__slowo" aria-hidden="true">
-		<span class="vs-o-mnie__litery">
-			<span class="vs-o-mnie__litera" style="--i: 0">O</span> <span class="vs-o-mnie__litera" style="--i: 1">m</span><span class="vs-o-mnie__litera" style="--i: 2">n</span><span class="vs-o-mnie__litera" style="--i: 3">i</span><span class="vs-o-mnie__litera" style="--i: 4">e</span>		</span>
-	</div>
-</section>
+					<div class="vs-efekty__slowo" aria-hidden="true" style="--ile: 7">
+			<span class="vs-efekty__litery">
+				<span class="vs-efekty__litera" style="--i: 0">G</span><span class="vs-efekty__litera" style="--i: 1">a</span><span class="vs-efekty__litera" style="--i: 2">l</span><span class="vs-efekty__litera" style="--i: 3">e</span><span class="vs-efekty__litera" style="--i: 4">r</span><span class="vs-efekty__litera" style="--i: 5">i</span><span class="vs-efekty__litera" style="--i: 6">a</span>			</span>
+		</div>
+	</section>
 
 
 <section class="vs-opinie vs-opinie--slider wp-block-visual-scale-opinie" id="opinie" aria-labelledby="vs-opinie-tytul">

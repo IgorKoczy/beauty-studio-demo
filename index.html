@@ -2252,8 +2252,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 
 </style>
-<style id="visual-scale-o-mnie-style-inline-css">
-/*
+<style>/*
  * O mnie (sekcja 07) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
  * tekst od 8,65% szerokości, kolumna 35,2%; portret (wycięty PNG) 47,4% szerokości przy prawej i dolnej krawędzi;
  * „O mnie” pismem Meddon, czerwone, od 36% szerokości, na dole, przed zdjęciem.
@@ -2601,8 +2600,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		translate: calc(0.4em + var(--i, 0) * 0.3em) 0;
 	}
 }
-
-
 </style>
 <style>/*
  * Opinie (sekcja 08): układ nasz pod wygodę klientki, kolory, kroje i cienkie linie Adriana (jak w cenniku).
@@ -2878,17 +2875,18 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
  * (u Adriana x 315 i 1605 przy 1920 px), kropki pod opinią. Pas opinii przewija się w bok z przyciąganiem, więc palcem
  * i z klawiatury działa bez skryptu; strzałki i kropki pokazuje view.js. Telefon: strzałki i kropki w jednym rzędzie
  * pod opinią. Bez linii nad kartą, bez podsumowania w nagłówku (ocena jest w pierwszym ekranie).
+ * Mechanika slidera jest wspólna dla obu szablonów (klasa vs-opinie--slider); pod .vs-szablon-1 zostaje tylko krój i odstępy.
  */
 .vs-szablon-1 .vs-opinie {
 	padding-block: clamp(80px, 14vw, 270px) clamp(80px, 11vw, 210px);
 	text-align: center;
 }
 
-.vs-szablon-1 .vs-opinie__wnetrze {
+.vs-opinie--slider .vs-opinie__wnetrze {
 	gap: clamp(48px, 6.5vw, 125px);
 }
 
-.vs-szablon-1 .vs-opinie__glowka {
+.vs-opinie--slider .vs-opinie__glowka {
 	justify-content: center;
 }
 
@@ -2904,7 +2902,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /* Slider: telefon pas na górze, pod nim strzałka, kropki, strzałka (kolejność jak w kodzie). */
-.vs-szablon-1 .vs-opinie__slider {
+.vs-opinie--slider .vs-opinie__slider {
 	display: grid;
 	grid-template-columns: auto auto auto;
 	grid-template-areas:
@@ -2917,7 +2915,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	margin-inline: auto;
 }
 
-.vs-szablon-1 .vs-opinie__lista {
+.vs-opinie--slider .vs-opinie__lista {
 	grid-area: pas;
 	display: grid;
 	grid-template-columns: none;
@@ -2930,16 +2928,16 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	scrollbar-width: none;
 }
 
-.vs-szablon-1 .vs-opinie__lista::-webkit-scrollbar {
+.vs-opinie--slider .vs-opinie__lista::-webkit-scrollbar {
 	display: none;
 }
 
-.vs-szablon-1 .vs-opinie__lista:focus-visible {
+.vs-opinie--slider .vs-opinie__lista:focus-visible {
 	outline: 2px solid currentColor;
 	outline-offset: 8px;
 }
 
-.vs-szablon-1 .vs-opinie__opinia {
+.vs-opinie--slider .vs-opinie__opinia {
 	position: relative;
 	container-type: normal;
 	padding-inline: 4px;
@@ -2947,7 +2945,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	scroll-snap-stop: always;
 }
 
-.vs-szablon-1 .vs-opinie__karta {
+.vs-opinie--slider .vs-opinie__karta {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -2957,20 +2955,20 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	animation: none;
 }
 
-.vs-szablon-1 .vs-opinie__tekst p {
+.vs-opinie--slider .vs-opinie__tekst p {
 	max-width: 48rem;
 	margin-inline: auto;
 	font-size: 0.9375rem;
 	line-height: 1.85;
 }
 
-.vs-szablon-1 .vs-opinie__kto {
+.vs-opinie--slider .vs-opinie__kto {
 	justify-items: center;
 	gap: clamp(14px, 1.9vw, 36px);
 	margin-top: clamp(24px, 3.3vw, 64px);
 }
 
-.vs-szablon-1 .vs-opinie__imie {
+.vs-opinie--slider .vs-opinie__imie {
 	font-family: var(--wp--custom--font--tekst);
 	font-size: 1rem;
 	font-weight: 400;
@@ -2978,17 +2976,17 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	text-transform: none;
 }
 
-.vs-szablon-1 .vs-opinie__ocena {
+.vs-opinie--slider .vs-opinie__ocena {
 	gap: 2px;
 }
 
-.vs-szablon-1 .vs-opinie__gwiazdka {
+.vs-opinie--slider .vs-opinie__gwiazdka {
 	width: 18px;
 	height: 18px;
 }
 
 /* Strzałki: cienkie (Phosphor caret light) i szare jak u Adriana, białe po najechaniu; pole 48 px. */
-.vs-szablon-1 .vs-opinie__strzalka {
+.vs-opinie--slider .vs-opinie__strzalka {
 	display: grid;
 	place-items: center;
 	width: 48px;
@@ -3001,51 +2999,51 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	transition: color 200ms ease, translate 200ms var(--vs-ruch-wyjscie);
 }
 
-.vs-szablon-1 .vs-opinie__strzalka[hidden],
-.vs-szablon-1 .vs-opinie__kropki[hidden] {
+.vs-opinie--slider .vs-opinie__strzalka[hidden],
+.vs-opinie--slider .vs-opinie__kropki[hidden] {
 	display: none;
 }
 
-.vs-szablon-1 .vs-opinie__strzalka--wstecz {
+.vs-opinie--slider .vs-opinie__strzalka--wstecz {
 	grid-area: wstecz;
 }
 
-.vs-szablon-1 .vs-opinie__strzalka--dalej {
+.vs-opinie--slider .vs-opinie__strzalka--dalej {
 	grid-area: dalej;
 }
 
-.vs-szablon-1 .vs-opinie__strzalka-ikona {
+.vs-opinie--slider .vs-opinie__strzalka-ikona {
 	width: 36px;
 	height: 36px;
 }
 
-.vs-szablon-1 .vs-opinie__strzalka:active {
+.vs-opinie--slider .vs-opinie__strzalka:active {
 	scale: 0.94;
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.vs-szablon-1 .vs-opinie__strzalka:hover {
+	.vs-opinie--slider .vs-opinie__strzalka:hover {
 		color: var(--vs-na-ciemnym);
 	}
 
-	.vs-szablon-1 .vs-opinie__strzalka--wstecz:hover {
+	.vs-opinie--slider .vs-opinie__strzalka--wstecz:hover {
 		translate: -3px 0;
 	}
 
-	.vs-szablon-1 .vs-opinie__strzalka--dalej:hover {
+	.vs-opinie--slider .vs-opinie__strzalka--dalej:hover {
 		translate: 3px 0;
 	}
 }
 
 /* Kropki: 10 px, bieżąca biała, reszta szara; pole każdej 24 px. */
-.vs-szablon-1 .vs-opinie__kropki {
+.vs-opinie--slider .vs-opinie__kropki {
 	display: flex;
 	grid-area: kropki;
 	justify-content: center;
 	gap: 0;
 }
 
-.vs-szablon-1 .vs-opinie__kropka {
+.vs-opinie--slider .vs-opinie__kropka {
 	display: grid;
 	place-items: center;
 	width: 24px;
@@ -3056,7 +3054,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	cursor: pointer;
 }
 
-.vs-szablon-1 .vs-opinie__kropka::before {
+.vs-opinie--slider .vs-opinie__kropka::before {
 	content: "";
 	width: 10px;
 	height: 10px;
@@ -3065,12 +3063,12 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	transition: background-color 200ms ease, scale 200ms var(--vs-ruch-wyjscie);
 }
 
-.vs-szablon-1 .vs-opinie__kropka[aria-current="true"]::before {
+.vs-opinie--slider .vs-opinie__kropka[aria-current="true"]::before {
 	background: var(--vs-na-ciemnym);
 }
 
 @media (min-width: 48rem) {
-	.vs-szablon-1 .vs-opinie__slider {
+	.vs-opinie--slider .vs-opinie__slider {
 		grid-template-columns: auto minmax(0, 1fr) auto;
 		grid-template-areas:
 			"wstecz pas dalej"
@@ -3079,17 +3077,17 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		gap: clamp(40px, 5.6vw, 108px) clamp(16px, 3vw, 56px);
 	}
 
-	.vs-szablon-1 .vs-opinie__strzalka {
+	.vs-opinie--slider .vs-opinie__strzalka {
 		width: 56px;
 		height: 56px;
 	}
 
-	.vs-szablon-1 .vs-opinie__strzalka-ikona {
+	.vs-opinie--slider .vs-opinie__strzalka-ikona {
 		width: 44px;
 		height: 44px;
 	}
 
-	.vs-szablon-1 .vs-opinie__tekst p {
+	.vs-opinie--slider .vs-opinie__tekst p {
 		font-size: 1rem;
 		line-height: 2.1;
 	}
@@ -3097,8 +3095,98 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 /* Komputer: opinia w trzech wierszach jak u Adriana (ok. 915 px przy 1920). */
 @media (min-width: 64rem) {
-	.vs-szablon-1 .vs-opinie__tekst p {
+	.vs-opinie--slider .vs-opinie__tekst p {
 		max-width: 58rem;
+	}
+}
+
+/*
+ * Szablon 3 (Igor 21.10.2026: opinie „mniej więcej tak, jak jest w szablonie grafika”): na bordo „OPINIE” na środku, slider
+ * jak w szablonie 1 (wspólne reguły wyżej) i dwa czarno-białe zdjęcia ozdobne po przekątnej. Pomiar projektu przy 1920 px:
+ * zdjęcia 203 x 203 px, lewe górne 168 px od lewej i 109 px od góry, prawe dolne 168 px od prawej i 88 px od dołu;
+ * tytuł ok. 420 px od góry sekcji, kropki ok. 240 px nad dołem. Zdjęcia płyną przy przewijaniu w przeciwne strony
+ * (głębia, tylko translate); przy ograniczonym ruchu stoją.
+ */
+.vs-opinie--slider {
+	text-align: center;
+}
+
+.vs-opinie--slider .vs-opinie__tytul {
+	justify-items: center;
+}
+
+.vs-szablon-3 .vs-opinie--slider {
+	position: relative;
+	overflow: clip;
+	padding-block: clamp(150px, 21vw, 400px) clamp(150px, 12.5vw, 240px);
+}
+
+.vs-opinie--slider .vs-opinie__wnetrze {
+	position: relative;
+	z-index: 1;
+}
+
+.vs-opinie__ozdoba {
+	position: absolute;
+	z-index: 0;
+	width: clamp(88px, 10.6vw, 220px);
+	aspect-ratio: 1;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.vs-opinie__ozdoba img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.vs-opinie__ozdoba--1 {
+	top: clamp(28px, 5.7vw, 110px);
+	left: max(var(--vs-margines), 8.75vw);
+}
+
+.vs-opinie__ozdoba--2 {
+	right: max(var(--vs-margines), 8.75vw);
+	bottom: clamp(28px, 4.6vw, 90px);
+}
+
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-opinie--slider {
+			view-timeline: --vs-opinie-sekcja block;
+		}
+
+		.vs-opinie__ozdoba--1,
+		.vs-opinie__ozdoba--2 {
+			animation: vs-opinie-ozdoba-1 linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-opinie-sekcja;
+			animation-range: cover 0% cover 100%;
+		}
+
+		.vs-opinie__ozdoba--2 {
+			animation-name: vs-opinie-ozdoba-2;
+		}
+	}
+}
+
+@keyframes vs-opinie-ozdoba-1 {
+	from {
+		translate: 0 40px;
+	}
+	to {
+		translate: 0 -40px;
+	}
+}
+
+@keyframes vs-opinie-ozdoba-2 {
+	from {
+		translate: 0 -24px;
+	}
+	to {
+		translate: 0 24px;
 	}
 }
 </style>
@@ -4429,7 +4517,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 </style>
-<style>/*
+<style id="visual-scale-kontakt-style-inline-css">
+/*
  * Kontakt (sekcja 10) w układzie Adriana (szablon 3), proporcje z pomiaru przy 1920 px:
  * bordo; zdjęcie 25,4% szerokości od 13,5%, z „Do zobaczenia!” pismem mazakiem na dole zdjęcia (przechył ok. 16°);
  * odstęp 11,7%; KONTAKT (Oswald ok. 74 px) i formularz 28,1% szerokości: pola z białą ramką 69 px, wiadomość 212 px,
@@ -4795,6 +4884,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		order: 0;
 	}
 }
+
+
 </style>
 <style id="wp-block-group-inline-css">
 .wp-block-group{box-sizing:border-box}:where(.wp-block-group.wp-block-group-is-layout-constrained){position:relative}
@@ -5892,35 +5983,39 @@ if ( czekajace.size ) {
 </section>
 
 
-<section class="vs-opinie wp-block-visual-scale-opinie" id="opinie" aria-labelledby="vs-opinie-tytul">
-	<div class="vs-opinie__wnetrze">
+<section class="vs-opinie vs-opinie--slider wp-block-visual-scale-opinie" id="opinie" aria-labelledby="vs-opinie-tytul">
+			<div class="vs-opinie__ozdoba vs-opinie__ozdoba--1" aria-hidden="true">
+			<img width="500" height="500" src="media/opinie-2.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />		</div>
+			<div class="vs-opinie__ozdoba vs-opinie__ozdoba--2" aria-hidden="true">
+			<img width="500" height="500" src="media/opinie-3.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />		</div>
+		<div class="vs-opinie__wnetrze">
 		<div class="vs-opinie__glowka">
-			<h2 class="vs-tytul vs-opinie__tytul" id="vs-opinie-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-opinie__tytul-glowna"><span class="vs-ukryte">Opinie</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">O</span><span class="vs-litera" style="--i: 1">p</span><span class="vs-litera" style="--i: 2">i</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">e</span></span></span></span></span> <span class="vs-tytul__dopisek vs-opinie__tytul-dopisek">klientek</span></h2>							<p class="vs-opinie__podsumowanie" data-vs-wjazd>
-					<span class="vs-opinie__ocena"><span class="vs-ukryte">Ocena 5,0 na 5</span><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span>					<span>
-						5,0 na 5 z 64 opinii · Booksy					</span>
-									</p>
-					</div>
+			<h2 class="vs-tytul vs-opinie__tytul" id="vs-opinie-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-opinie__tytul-glowna"><span class="vs-ukryte">Opinie</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">O</span><span class="vs-litera" style="--i: 1">p</span><span class="vs-litera" style="--i: 2">i</span><span class="vs-litera" style="--i: 3">n</span><span class="vs-litera" style="--i: 4">i</span><span class="vs-litera" style="--i: 5">e</span></span></span></span></span></h2>					</div>
 
-					<ul class="vs-opinie__lista" role="list">
-													<li class="vs-opinie__opinia" data-vs-wjazd>
+					<div class="vs-opinie__slider" data-vs-slider data-vs-wjazd>
+			<ul class="vs-opinie__lista" id="vs-opinie-lista" role="list" tabindex="0" aria-label="Opinie klientek">
+													<li class="vs-opinie__opinia is-bez-zdjecia">
 					<figure class="vs-opinie__karta">
-													<div class="vs-opinie__zdjecie" aria-hidden="true">
-								<img width="500" height="500" src="media/opinie-2.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />							</div>
-																		<figcaption class="vs-opinie__kto">
+												<blockquote class="vs-opinie__tekst"><p>„To był mój ślubny makijaż i do dziś wspominam go z uśmiechem. Marta spokojnie wysłuchała moich oczekiwań, zrobiła próbny makijaż i dobrała look dokładnie pod mnie. Wytrzymał od porannych przygotowań aż do ostatniego tańca, a na zdjęciach wygląda przepięknie. Gorąco polecam!”</p></blockquote>						<figcaption class="vs-opinie__kto">
 							<span class="vs-opinie__imie">Anna K.</span>
 															<span class="vs-opinie__ocena"><span class="vs-ukryte">Ocena 5,0 na 5</span><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span>																				</figcaption>
-						<blockquote class="vs-opinie__tekst"><p>„To był mój ślubny makijaż i do dziś wspominam go z uśmiechem. Marta spokojnie wysłuchała moich oczekiwań, zrobiła próbny makijaż i dobrała look dokładnie pod mnie. Wytrzymał od porannych przygotowań aż do ostatniego tańca, a na zdjęciach wygląda przepięknie. Gorąco polecam!”</p></blockquote>					</figure>
+											</figure>
 				</li>
-											<li class="vs-opinie__opinia" data-vs-wjazd>
+											<li class="vs-opinie__opinia is-bez-zdjecia">
 					<figure class="vs-opinie__karta">
-													<div class="vs-opinie__zdjecie" aria-hidden="true">
-								<img width="500" height="500" src="media/opinie-3.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />							</div>
-																		<figcaption class="vs-opinie__kto">
+												<blockquote class="vs-opinie__tekst"><p>„Byłam u Marty przed ważnym wydarzeniem i od pierwszej minuty czułam się zaopiekowana. Makijaż był delikatny, a jednocześnie pięknie podkreślił moje oczy. Dostałam też kilka praktycznych wskazówek, jak go poprawiać w ciągu dnia. Na pewno wrócę.”</p></blockquote>						<figcaption class="vs-opinie__kto">
 							<span class="vs-opinie__imie">Katarzyna W.</span>
 															<span class="vs-opinie__ocena"><span class="vs-ukryte">Ocena 5,0 na 5</span><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-opinie__gwiazdka" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span>																				</figcaption>
-						<blockquote class="vs-opinie__tekst"><p>„Byłam u Marty przed ważnym wydarzeniem i od pierwszej minuty czułam się zaopiekowana. Makijaż był delikatny, a jednocześnie pięknie podkreślił moje oczy. Dostałam też kilka praktycznych wskazówek, jak go poprawiać w ciągu dnia. Na pewno wrócę.”</p></blockquote>					</figure>
+											</figure>
 				</li>
 					</ul>
+										<button class="vs-opinie__strzalka vs-opinie__strzalka--wstecz" type="button" data-kierunek="-1" aria-controls="vs-opinie-lista" hidden><svg class="vs-opinie__strzalka-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M164.24,203.76a6,6,0,1,1-8.48,8.48l-80-80a6,6,0,0,1,0-8.48l80-80a6,6,0,0,1,8.48,8.48L88.49,128Z"/></svg><span class="vs-ukryte">Poprzednia opinia</span></button>
+				<div class="vs-opinie__kropki" hidden>
+											<button class="vs-opinie__kropka" type="button" data-numer="0" aria-controls="vs-opinie-lista"><span class="vs-ukryte">Opinia 1 z 2</span></button>
+											<button class="vs-opinie__kropka" type="button" data-numer="1" aria-controls="vs-opinie-lista"><span class="vs-ukryte">Opinia 2 z 2</span></button>
+									</div>
+				<button class="vs-opinie__strzalka vs-opinie__strzalka--dalej" type="button" data-kierunek="1" aria-controls="vs-opinie-lista" hidden><svg class="vs-opinie__strzalka-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M180.24,132.24l-80,80a6,6,0,0,1-8.48-8.48L167.51,128,91.76,52.24a6,6,0,0,1,8.48-8.48l80,80A6,6,0,0,1,180.24,132.24Z"/></svg><span class="vs-ukryte">Następna opinia</span></button>
+			</div>
 		
 					<p class="vs-opinie__uwaga">Opinie i zdjęcia przykładowe z projektu szablonu.</p>
 			</div>

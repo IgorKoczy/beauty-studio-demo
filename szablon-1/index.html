@@ -397,6 +397,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 @media (min-width: 64rem) {
+	/*
+	 * Na zdjęciu pierwszego ekranu pasek ma półprzezroczyste jasne tło (Igor 21.10.2026: „header się zlewa u góry”):
+	 * ta sama warstwa co po przewinięciu, z mniejszym kryciem, więc zmiana stanu to nadal tylko przezroczystość
+	 * (bez rozmycia, płynność). Na telefonie zostaje sama ikona menu na zdjęciu.
+	 */
+	.vs-szablon-2 .vs-pasek:not([data-stan="przewiniety"])::before {
+		opacity: 0.8;
+	}
+
 	.vs-szablon-2 .vs-pasek__rezerwacja {
 		border-color: var(--vs-ciemne);
 		background-color: var(--vs-ciemne);
@@ -1223,6 +1232,77 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	display: inline-block;
 }
 
+/* Dwie warstwy liter w jednym miejscu: brązowa (napis u góry) i jasna (napis Adriana na dole); na telefonie tylko jasna. */
+.vs-hero__wielkie-warstwy {
+	display: grid;
+}
+
+.vs-hero__wielkie-warstwy > .vs-hero__wielkie-litery {
+	grid-area: 1 / 1;
+}
+
+.vs-hero__wielkie-warstwy > .vs-hero__wielkie-litery--braz,
+.vs-hero__opis {
+	display: none;
+}
+
+/*
+ * Komputer (Igor 21.10.2026: „w hero my nie mamy tekstu widocznego żadnego … żeby on zaczynał się od góry, subtelnie,
+ * i potem przechodził razem z użytkownikiem”): nazwa zaczyna tuż nad kartą portretu, o połowę mniejsza (szerokość
+ * karty), brązem, z zawodem i miastem nad nią, czytelna na jasnym zdjęciu. Przy przewijaniu zjeżdża na dolną krawędź
+ * i rośnie do wielkiego jasnego napisu Adriana (niżej, oś przewijania), a karta w tym czasie stoi (o-mnie/style.css).
+ * Bez osi przewijania i przy ograniczonym ruchu zostaje czytelny napis u góry.
+ */
+@media (min-width: 64rem) {
+	.vs-szablon-2 .vs-hero__wielkie {
+		display: grid;
+		justify-items: center;
+		transform-origin: 50% calc(100% - 0.165em);
+		translate: 0 calc(-1 * (var(--vs2-zakladka) + 28px));
+		scale: 0.5;
+	}
+
+	/* Wielkość podwójna, bo napis startuje w skali 0,5 (widać 14 do 20 px); padding wyrównuje odstęp po ostatniej literze. */
+	.vs-szablon-2 .vs-hero__opis {
+		display: block;
+		margin-bottom: 1.1em;
+		padding-left: 0.3em;
+		font-family: var(--wp--custom--font--tekst);
+		font-size: clamp(28px, 1.5vw, 40px);
+		font-weight: 500;
+		letter-spacing: 0.3em;
+		line-height: 1.4;
+		color: var(--vs-ciemne);
+	}
+
+	/*
+	 * Jasna mgiełka tylko pod napisem (scroll-craft: zasłona tam, gdzie tekst, nie na całym zdjęciu): brąz ma kontrast
+	 * także nad ciemniejszymi miejscami zdjęcia klientki (stół, lampy, roślina). Gaśnie, gdy nazwa zaczyna zjeżdżać.
+	 */
+	.vs-szablon-2 .vs-hero__wielkie::before {
+		content: "";
+		position: absolute;
+		inset: -0.35em -22vw -0.25em;
+		z-index: -1;
+		background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-jasne) 78%, transparent) 62%, color-mix(in srgb, var(--vs-jasne) 0%, transparent));
+		pointer-events: none;
+	}
+
+	.vs-szablon-2 .vs-hero__wielkie-litery--braz {
+		display: block;
+		color: var(--vs-ciemne);
+	}
+
+	.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
+		opacity: 0;
+	}
+
+	/* Litery wstają spod linii słowa (maska w miejscu napisu u góry, nie tylko na krawędzi zdjęcia). */
+	.vs-szablon-2 .vs-hero__wielkie-slowo {
+		clip-path: inset(-1em -0.2em 0 -0.2em);
+	}
+}
+
 /* Telefon i tablet w pionie: niższe zdjęcie, nazwa w dwóch wierszach (każde słowo osobno), karta portretu pod spodem. */
 @media (max-width: 63.99rem) {
 	.vs-szablon-2 .vs-hero {
@@ -1258,6 +1338,39 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		display: grid;
 		justify-items: center;
 	}
+
+	/*
+	 * Szablon 2 na telefonie: nazwa zostaje na dole zdjęcia, a zawód z miastem stoją u góry pod paskiem (jak tytuł
+	 * i nadtytuł na okładce), brązem na jasnej mgiełce; w pierwszym ekranie widać, kto, co i gdzie.
+	 */
+	.vs-szablon-2 .vs-hero__wielkie {
+		position: static;
+	}
+
+	.vs-szablon-2 .vs-hero__opis {
+		position: absolute;
+		inset: calc(var(--vs-pasek) + env(safe-area-inset-top, 0px) + 8px) 0 auto;
+		display: block;
+		padding: 12px var(--vs-margines);
+		font-family: var(--wp--custom--font--tekst);
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: 0.24em;
+		line-height: 1.5;
+		text-align: center;
+		white-space: normal;
+		color: var(--vs-ciemne);
+		background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-jasne) 78%, transparent) 55%, color-mix(in srgb, var(--vs-jasne) 0%, transparent));
+	}
+
+	/* Każda część w swoim wierszu bez kropki (lekcja 20.10.2026: przy łamaniu kropka zaczynała albo kończyła wiersz). */
+	.vs-szablon-2 .vs-hero__opis-czesc {
+		display: block;
+	}
+
+	.vs-szablon-2 .vs-hero__opis-kropka {
+		display: none;
+	}
 }
 
 /* Ruch: litery nazwy wstają spod krawędzi po kolei (maską jest dolna krawędź pierwszego ekranu), po zdjęciu. */
@@ -1271,6 +1384,84 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 @keyframes vs-hero2-litera {
 	from {
 		translate: 0 105%;
+	}
+}
+
+/*
+ * Zjazd nazwy (komputer, oś przewijania strony): przez pierwszą zakładkę przewijania nazwa zjeżdża ze stanu nad kartą
+ * na dolną krawędź i rośnie do pełnej wielkości (107 % szerokości jak u Adriana); w połowie drogi brąz przechodzi
+ * w jasny kolor tła sekcji pod spodem, a zawód z miastem gaśnie na początku. Na końcu zjazdu od dołu wjeżdża jasne tło
+ * O mnie i nazwa w nie wchodzi, jak w projekcie. Zawód z miastem przy wczytaniu odsłania się od lewej po literach.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	.vs-szablon-2 .vs-hero__opis {
+		animation: vs-hero2-opis-wjazd 900ms var(--vs-ruch-wyjscie) 900ms both;
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+		.vs-szablon-2 .vs-hero__wielkie {
+			animation: vs-hero2-zjazd linear both;
+			animation-duration: auto;
+			animation-timeline: scroll(root);
+			animation-range: 0 var(--vs2-zakladka);
+		}
+
+		.vs-szablon-2 .vs-hero__wielkie::before {
+			animation: vs-hero2-gasnie linear both;
+			animation-duration: auto;
+			animation-timeline: scroll(root);
+			animation-range: 0 calc(var(--vs2-zakladka) * 0.3);
+		}
+
+		.vs-szablon-2 .vs-hero__opis {
+			animation: vs-hero2-opis-wjazd 900ms var(--vs-ruch-wyjscie) 900ms both, vs-hero2-gasnie linear both;
+			animation-duration: 900ms, auto;
+			animation-timeline: auto, scroll(root);
+			animation-range: normal, 0 calc(var(--vs2-zakladka) * 0.3);
+		}
+
+		.vs-szablon-2 .vs-hero__wielkie-litery--braz,
+		.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
+			animation: vs-hero2-gasnie linear both;
+			animation-duration: auto;
+			animation-timeline: scroll(root);
+			animation-range: calc(var(--vs2-zakladka) * 0.3) calc(var(--vs2-zakladka) * 0.8);
+		}
+
+		.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
+			animation-name: vs-hero2-zapala;
+		}
+	}
+}
+
+@keyframes vs-hero2-opis-wjazd {
+	from {
+		clip-path: inset(0 100% 0 0);
+	}
+
+	to {
+		clip-path: inset(0 -1em 0 0);
+	}
+}
+
+@keyframes vs-hero2-zjazd {
+	to {
+		translate: 0 0;
+		scale: 1;
+	}
+}
+
+@keyframes vs-hero2-gasnie {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes vs-hero2-zapala {
+	to {
+		opacity: 1;
 	}
 }
 </style>
@@ -1625,8 +1816,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 /*
  * Szablon 2 (beż i brąz Adriana, pomiar 1920 px, o-mnie/szablon-2.php): portret w zaokrąglonej karcie 1023 x 1120
- * (53,3 % szerokości, róg ok. 44 px) nachodzi na zdjęcie pierwszego ekranu o 34 % jego wysokości (górna część sekcji
- * jest przezroczysta, jasne tło zaczyna się pod zdjęciem); pod kartą na środku: zawód małymi wersalikami, imię
+ * (53,3 % szerokości, róg ok. 44 px) nachodzi na zdjęcie pierwszego ekranu (u Adriana o 34 % jego wysokości, u nas
+ * wyżej i z jazdą przy przewijaniu, niżej; górna część sekcji jest przezroczysta, jasne tło zaczyna się pod
+ * zdjęciem); pod kartą na środku: zawód małymi wersalikami, imię
  * i nazwisko Tenor Sans, kreska 87 px w brązie, dwa akapity (Montserrat 15 px, interlinia 26 px), ocena z opinii.
  * Telefon: karta pod zdjęciem (bez nachodzenia, żeby nie zakryła nazwy).
  */
@@ -1643,11 +1835,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	text-align: center;
 }
 
+.vs-szablon-2 .vs-o-mnie__tor {
+	justify-self: stretch;
+}
+
 .vs-o-mnie__karta {
 	position: relative;
 	width: min(100%, 30rem);
 	aspect-ratio: 1023 / 1120;
-	margin: 0;
+	margin: 0 auto;
 	overflow: hidden;
 	border-radius: clamp(24px, 2.3vw, 44px);
 	background: var(--vs-posrednie);
@@ -1764,15 +1960,44 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
+/*
+ * Komputer (Igor 21.10.2026: zdjęcie ma być widoczne w pierwszym ekranie, wyżej, a przy przewijaniu „jechać z nami”
+ * do treści): karta zachodzi na zdjęcie pierwszego ekranu o zakładkę (--vs2-zakladka w baza.css: do 30 % szerokości
+ * ekranu, twarz i dłoń od razu widać, karta zawsze pod paskiem). Jasne tło sekcji zaczyna się o jazdę karty
+ * (--vs2-jazda) niżej i wjeżdża od dołu.
+ */
 @media (min-width: 64rem) {
 	.vs-szablon-2 .vs-o-mnie {
-		margin-top: -34svh;
+		margin-top: calc(-1 * var(--vs2-zakladka));
 		padding-top: 0;
-		background: linear-gradient(to bottom, transparent 34svh, var(--vs-jasne) 34svh);
+		background: linear-gradient(to bottom, transparent var(--vs2-jazda), var(--vs-jasne) var(--vs2-jazda));
 	}
 
 	.vs-o-mnie__karta {
 		width: 53.3vw;
+	}
+}
+
+/*
+ * Jazda karty: sticky w torze wyższym od karty o jazdę. Karta stoi w miejscu, a pod nią nazwa zjeżdża po zdjęciu
+ * pierwszego ekranu (hero/style.css) i wjeżdża jasne tło; gdy tło dojdzie do górnej krawędzi karty, karta na nim osiada
+ * i dalej jedzie z treścią. Odnośnik „O mnie” prowadzi do osiadłej karty (ujemny scroll-margin o jazdę).
+ * Ograniczony ruch: bez jazdy i bez dodatkowego przewijania, karta stoi na zdjęciu pierwszego ekranu.
+ */
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+	.vs-szablon-2 .vs-o-mnie {
+		scroll-margin-top: calc(-1 * var(--vs2-jazda));
+	}
+
+	.vs-szablon-2 .vs-o-mnie__tor::after {
+		content: "";
+		display: block;
+		height: var(--vs2-jazda);
+	}
+
+	.vs-szablon-2 .vs-o-mnie__karta {
+		position: sticky;
+		top: calc(100svh - var(--vs2-zakladka));
 	}
 }
 
@@ -4876,8 +5101,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /* Tło: beż z 6% bordo (jak Hasło), bo FAQ nad nią jest na czystym beżu (LEKCJE, punkt 19). */
 .vs-dojazd {
 	--vs-dojazd-tlo: color-mix(in srgb, var(--vs-ciemne) 6%, var(--vs-jasne));
-	/* Ląd OpenStreetMap po filtrze kafli: tło płótna w tym kolorze, więc szczeliny między kaflami są niewidoczne. */
-	--vs-dojazd-lad: #e2dcd1;
+	/* Ląd mapy = tło sekcji (jak ląd na obrazie z narzedzia/mapa.mjs): gdyby ekran był szerszy niż obraz, brzeg płótna
+	 * nie odcina się pasem. */
+	--vs-dojazd-lad: var(--vs-dojazd-tlo);
 	/* Miejsce znacznika na mapie (od lewej krawędzi mapy); view.js przesuwa mapę tak, żeby adres stał właśnie tu. */
 	--vs-dojazd-punkt-x: 50%;
 	/* Wysokość przejścia mapy w tło na telefonie (podpis mapy stoi nad nim). */
@@ -5006,10 +5232,12 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		display: none;
 	}
 
+	/* Obraz komputera 3200 x 1100 z punktem w (2200, 550): pokrywa mapę do ekranu ok. 3400 px (Igor miał pas tła z lewej
+	 * przy karcie szerszej niż dawny obraz 2400 px). */
 	.vs-dojazd__obraz img {
 		top: calc(50% - 550px);
-		left: calc(var(--vs-dojazd-punkt-x) - 1500px);
-		width: 2400px;
+		left: calc(var(--vs-dojazd-punkt-x) - 2200px);
+		width: 3200px;
 		height: 1100px;
 	}
 
@@ -5926,9 +6154,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		height: round(down, clamp(360px, 30vw, 560px), 2px);
 	}
 
-	/* Obraz mapy z punktem w (900, 550) z 2400 x 1100 (narzedzia/mapa.mjs dla szablonu 1), punkt na środku mapy. */
+	/* Obraz mapy z punktem w (900, 550) z 2400 x 1100 (narzedzia/mapa.mjs dla szablonu 1), punkt na środku mapy
+	 * (ramka ma najwyżej 1800 px, więc 900 px w każdą stronę wystarcza). */
 	.vs-szablon-1 .vs-dojazd__obraz img {
 		left: calc(var(--vs-dojazd-punkt-x) - 900px);
+		width: 2400px;
 	}
 }
 
@@ -6062,7 +6292,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
  */
 .vs-szablon-2 .vs-dojazd {
 	--vs-dojazd-tlo: var(--vs-posrednie);
-	--vs-dojazd-lad: #e8ddd5;
+	/* Ląd jak na obrazie mapy (jasny beż palety). */
+	--vs-dojazd-lad: var(--vs-jasne);
 	--vs-dojazd-rog: clamp(24px, 2.3vw, 44px);
 	--vs-dojazd-cien: rgb(97 82 67 / 0.5);
 	display: grid;
@@ -6289,7 +6520,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	@media (min-width: 64rem) {
 		.vs-szablon-2 .vs-dojazd__obraz img {
-			transform-origin: 1500px 550px;
+			transform-origin: 2200px 550px;
 		}
 	}
 }
@@ -8097,7 +8328,22 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		--vs2-tytul: clamp(2.125rem, 3vw, 4rem);
 		/* Ruch po ekranie (pokaz zdjęć, rozwinięcie akordeonu): mocne ease-in-out, spokojnie jak cały styl. */
 		--vs2-ruch: var(--wp--custom--ruch--w-miejscu, cubic-bezier(0.77, 0, 0.175, 1));
+		/*
+		 * Karta portretu O mnie na komputerze (Igor 21.10.2026): zachodzi na zdjęcie pierwszego ekranu o zakładkę (do 30 %
+		 * szerokości ekranu, zawsze pod paskiem) i jedzie z przewijaniem o --vs2-jazda, aż dojdzie do niej jasne tło sekcji.
+		 */
+		--vs2-zakladka: min(30vw, 100svh - var(--vs-pasek) - 32px);
+		--vs2-jazda: var(--vs2-zakladka);
 		font-synthesis-weight: none;
+	}
+
+	/* Z osią przewijania jazda jest dwa razy dłuższa: najpierw nazwa zjeżdża po zdjęciu (hero/style.css), potem jasne tło. */
+	@supports (animation-timeline: scroll()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.vs-szablon-2 {
+				--vs2-jazda: calc(2 * var(--vs2-zakladka));
+			}
+		}
 	}
 
 	.vs-szablon-2 .vs-wordmark {

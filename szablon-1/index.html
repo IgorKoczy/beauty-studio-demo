@@ -1186,12 +1186,14 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*
  * Szablon 2 (beż i brąz Adriana, pomiar 1920 px, hero/szablon-2.php): wnętrze salonu na cały ekran, na dolnej krawędzi
  * wielka nazwa marki Tenor Sans w kolorze jasnego tła (linia bazowa na krawędzi, litery „wyrastają” z sekcji pod spodem),
- * na zdjęcie nachodzi karta portretu z O mnie. Rozmiar nazwy z liczby znaków: ok. 107 % szerokości jak „TWOJE LOGO”
+ * na zdjęcie nachodzi karta portretu z O mnie (na komputerze na starcie mniejsza, rośnie przy przewijaniu). Rozmiar nazwy z liczby znaków: ok. 107 % szerokości jak „TWOJE LOGO”
  * u Adriana (Tenor Sans: średnio 0,70 em na znak, linia bazowa 0,835 em od góry wiersza przy interlinii 1).
  * Telefon: nazwa w dwóch wierszach (imię i nazwisko), rozmiar z dłuższego słowa.
  */
+/* Kolumna o stałej szerokości: nazwa szersza od ekranu (107 %) nie rozpycha jej w prawo, wystaje po równo z obu stron. */
 .vs-szablon-2 .vs-hero {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	align-content: end;
 	justify-items: stretch;
 	min-height: 100svh;
@@ -1232,77 +1234,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	display: inline-block;
 }
 
-/* Dwie warstwy liter w jednym miejscu: brązowa (napis u góry) i jasna (napis Adriana na dole); na telefonie tylko jasna. */
-.vs-hero__wielkie-warstwy {
-	display: grid;
-}
-
-.vs-hero__wielkie-warstwy > .vs-hero__wielkie-litery {
-	grid-area: 1 / 1;
-}
-
-.vs-hero__wielkie-warstwy > .vs-hero__wielkie-litery--braz,
-.vs-hero__opis {
-	display: none;
-}
-
-/*
- * Komputer (Igor 21.10.2026: „w hero my nie mamy tekstu widocznego żadnego … żeby on zaczynał się od góry, subtelnie,
- * i potem przechodził razem z użytkownikiem”): nazwa zaczyna tuż nad kartą portretu, o połowę mniejsza (szerokość
- * karty), brązem, z zawodem i miastem nad nią, czytelna na jasnym zdjęciu. Przy przewijaniu zjeżdża na dolną krawędź
- * i rośnie do wielkiego jasnego napisu Adriana (niżej, oś przewijania), a karta w tym czasie stoi (o-mnie/style.css).
- * Bez osi przewijania i przy ograniczonym ruchu zostaje czytelny napis u góry.
- */
-@media (min-width: 64rem) {
-	.vs-szablon-2 .vs-hero__wielkie {
-		display: grid;
-		justify-items: center;
-		transform-origin: 50% calc(100% - 0.165em);
-		translate: 0 calc(-1 * (var(--vs2-zakladka) + 28px));
-		scale: 0.5;
-	}
-
-	/* Wielkość podwójna, bo napis startuje w skali 0,5 (widać 14 do 20 px); padding wyrównuje odstęp po ostatniej literze. */
-	.vs-szablon-2 .vs-hero__opis {
-		display: block;
-		margin-bottom: 1.1em;
-		padding-left: 0.3em;
-		font-family: var(--wp--custom--font--tekst);
-		font-size: clamp(28px, 1.5vw, 40px);
-		font-weight: 500;
-		letter-spacing: 0.3em;
-		line-height: 1.4;
-		color: var(--vs-ciemne);
-	}
-
-	/*
-	 * Jasna mgiełka tylko pod napisem (scroll-craft: zasłona tam, gdzie tekst, nie na całym zdjęciu): brąz ma kontrast
-	 * także nad ciemniejszymi miejscami zdjęcia klientki (stół, lampy, roślina). Gaśnie, gdy nazwa zaczyna zjeżdżać.
-	 */
-	.vs-szablon-2 .vs-hero__wielkie::before {
-		content: "";
-		position: absolute;
-		inset: -0.35em -22vw -0.25em;
-		z-index: -1;
-		background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-jasne) 78%, transparent) 62%, color-mix(in srgb, var(--vs-jasne) 0%, transparent));
-		pointer-events: none;
-	}
-
-	.vs-szablon-2 .vs-hero__wielkie-litery--braz {
-		display: block;
-		color: var(--vs-ciemne);
-	}
-
-	.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
-		opacity: 0;
-	}
-
-	/* Litery wstają spod linii słowa (maska w miejscu napisu u góry, nie tylko na krawędzi zdjęcia). */
-	.vs-szablon-2 .vs-hero__wielkie-slowo {
-		clip-path: inset(-1em -0.2em 0 -0.2em);
-	}
-}
-
 /* Telefon i tablet w pionie: niższe zdjęcie, nazwa w dwóch wierszach (każde słowo osobno), karta portretu pod spodem. */
 @media (max-width: 63.99rem) {
 	.vs-szablon-2 .vs-hero {
@@ -1338,39 +1269,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		display: grid;
 		justify-items: center;
 	}
-
-	/*
-	 * Szablon 2 na telefonie: nazwa zostaje na dole zdjęcia, a zawód z miastem stoją u góry pod paskiem (jak tytuł
-	 * i nadtytuł na okładce), brązem na jasnej mgiełce; w pierwszym ekranie widać, kto, co i gdzie.
-	 */
-	.vs-szablon-2 .vs-hero__wielkie {
-		position: static;
-	}
-
-	.vs-szablon-2 .vs-hero__opis {
-		position: absolute;
-		inset: calc(var(--vs-pasek) + env(safe-area-inset-top, 0px) + 8px) 0 auto;
-		display: block;
-		padding: 12px var(--vs-margines);
-		font-family: var(--wp--custom--font--tekst);
-		font-size: 12px;
-		font-weight: 500;
-		letter-spacing: 0.24em;
-		line-height: 1.5;
-		text-align: center;
-		white-space: normal;
-		color: var(--vs-ciemne);
-		background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-jasne) 78%, transparent) 55%, color-mix(in srgb, var(--vs-jasne) 0%, transparent));
-	}
-
-	/* Każda część w swoim wierszu bez kropki (lekcja 20.10.2026: przy łamaniu kropka zaczynała albo kończyła wiersz). */
-	.vs-szablon-2 .vs-hero__opis-czesc {
-		display: block;
-	}
-
-	.vs-szablon-2 .vs-hero__opis-kropka {
-		display: none;
-	}
 }
 
 /* Ruch: litery nazwy wstają spod krawędzi po kolei (maską jest dolna krawędź pierwszego ekranu), po zdjęciu. */
@@ -1384,84 +1282,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 @keyframes vs-hero2-litera {
 	from {
 		translate: 0 105%;
-	}
-}
-
-/*
- * Zjazd nazwy (komputer, oś przewijania strony): przez pierwszą zakładkę przewijania nazwa zjeżdża ze stanu nad kartą
- * na dolną krawędź i rośnie do pełnej wielkości (107 % szerokości jak u Adriana); w połowie drogi brąz przechodzi
- * w jasny kolor tła sekcji pod spodem, a zawód z miastem gaśnie na początku. Na końcu zjazdu od dołu wjeżdża jasne tło
- * O mnie i nazwa w nie wchodzi, jak w projekcie. Zawód z miastem przy wczytaniu odsłania się od lewej po literach.
- */
-@media (prefers-reduced-motion: no-preference) {
-	.vs-szablon-2 .vs-hero__opis {
-		animation: vs-hero2-opis-wjazd 900ms var(--vs-ruch-wyjscie) 900ms both;
-	}
-}
-
-@supports (animation-timeline: scroll()) {
-	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-		.vs-szablon-2 .vs-hero__wielkie {
-			animation: vs-hero2-zjazd linear both;
-			animation-duration: auto;
-			animation-timeline: scroll(root);
-			animation-range: 0 var(--vs2-zakladka);
-		}
-
-		.vs-szablon-2 .vs-hero__wielkie::before {
-			animation: vs-hero2-gasnie linear both;
-			animation-duration: auto;
-			animation-timeline: scroll(root);
-			animation-range: 0 calc(var(--vs2-zakladka) * 0.3);
-		}
-
-		.vs-szablon-2 .vs-hero__opis {
-			animation: vs-hero2-opis-wjazd 900ms var(--vs-ruch-wyjscie) 900ms both, vs-hero2-gasnie linear both;
-			animation-duration: 900ms, auto;
-			animation-timeline: auto, scroll(root);
-			animation-range: normal, 0 calc(var(--vs2-zakladka) * 0.3);
-		}
-
-		.vs-szablon-2 .vs-hero__wielkie-litery--braz,
-		.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
-			animation: vs-hero2-gasnie linear both;
-			animation-duration: auto;
-			animation-timeline: scroll(root);
-			animation-range: calc(var(--vs2-zakladka) * 0.3) calc(var(--vs2-zakladka) * 0.8);
-		}
-
-		.vs-szablon-2 .vs-hero__wielkie-litery--jasne {
-			animation-name: vs-hero2-zapala;
-		}
-	}
-}
-
-@keyframes vs-hero2-opis-wjazd {
-	from {
-		clip-path: inset(0 100% 0 0);
-	}
-
-	to {
-		clip-path: inset(0 -1em 0 0);
-	}
-}
-
-@keyframes vs-hero2-zjazd {
-	to {
-		translate: 0 0;
-		scale: 1;
-	}
-}
-
-@keyframes vs-hero2-gasnie {
-	to {
-		opacity: 0;
-	}
-}
-
-@keyframes vs-hero2-zapala {
-	to {
-		opacity: 1;
 	}
 }
 </style>
@@ -1856,6 +1676,132 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	object-position: 50% 20%;
 }
 
+/*
+ * Podpis na zdjęciu (figcaption, Igor 21.10.2026: „nakładkę na zdjęcie … obok ramienia … może jakiś jej podpis”):
+ * w pustym tle zdjęcia po lewej od głowy i ramienia imię pismem, pod nim zawód Tenor Sans wersalikami i miasto drobnymi
+ * wersalikami, brązem (kontrast z tłem zdjęcia 6,2:1). Wielkości w cqi karty: na komputerze rosną razem z kartą,
+ * a na starcie (skala --vs2-karta-start) drobne napisy mają co najmniej 13 i 11 px. To miejsce na treść H1, gdy klientka ją poda.
+ */
+.vs-szablon-2 .vs-o-mnie__karta {
+	container-type: inline-size;
+}
+
+.vs-szablon-2 .vs-o-mnie__nakladka {
+	position: absolute;
+	top: 30%;
+	left: 7%;
+	display: grid;
+	justify-items: start;
+	max-width: 34%;
+	color: var(--vs-ciemne);
+	text-align: start;
+	pointer-events: none;
+}
+
+.vs-szablon-2 .vs-o-mnie__podpis {
+	margin-left: -0.04em;
+	font-family: var(--wp--custom--font--kursywa);
+	font-size: 12cqi;
+	line-height: 1;
+}
+
+.vs-szablon-2 .vs-o-mnie__nakladka-zawod {
+	max-width: 9em;
+	margin-top: 0.7em;
+	font-family: var(--wp--custom--font--naglowek);
+	font-size: max(calc(13px / var(--vs2-karta-start, 1)), 2.5cqi);
+	letter-spacing: 0.08em;
+	line-height: 1.25;
+	text-transform: uppercase;
+}
+
+.vs-szablon-2 .vs-o-mnie__nakladka-miasto {
+	margin-top: 1em;
+	font-size: max(calc(11px / var(--vs2-karta-start, 1)), 1.7cqi);
+	font-weight: 500;
+	letter-spacing: 0.3em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+/* Telefon: pod kartą od razu jest zawód i imię (O mnie), więc na zdjęciu zostaje sam podpis, trochę większy. */
+@media (max-width: 63.99rem) {
+	.vs-szablon-2 .vs-o-mnie__nakladka {
+		top: 23%;
+	}
+
+	.vs-szablon-2 .vs-o-mnie__podpis {
+		font-size: 14cqi;
+	}
+
+	.vs-szablon-2 .vs-o-mnie__nakladka-zawod,
+	.vs-szablon-2 .vs-o-mnie__nakladka-miasto {
+		display: none;
+	}
+}
+
+/* Wejście podpisu po karcie: imię pisze się od lewej, zawód i miasto wstają po nim (raz, przy wczytaniu). */
+@media (prefers-reduced-motion: no-preference) {
+	.vs-szablon-2 .vs-o-mnie__podpis {
+		animation: vs-o-mnie2-podpis 1200ms var(--vs-ruch-wyjscie) 700ms both;
+	}
+
+	.vs-szablon-2 .vs-o-mnie__nakladka-zawod,
+	.vs-szablon-2 .vs-o-mnie__nakladka-miasto {
+		animation: vs-o-mnie2-linia 700ms var(--vs-ruch-wyjscie) 1100ms both;
+	}
+
+	.vs-szablon-2 .vs-o-mnie__nakladka-miasto {
+		animation-delay: 1200ms;
+	}
+}
+
+/*
+ * Podpis gaśnie przy przewijaniu (Igor 21.10.2026: „ma być na pierwszy rzut oka w sekcji hero, a przy każdym scrollu
+ * w dół ma po prostu delikatnie znikać”): przezroczystość i lekkie uniesienie na osi przewijania strony; na komputerze
+ * znika, zanim karta dorośnie do pełnej wielkości, na telefonie przez pierwsze 40 % wysokości ekranu.
+ */
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.vs-szablon-2 .vs-o-mnie__nakladka {
+			animation: vs-o-mnie2-nakladka-znika linear both;
+			animation-duration: auto;
+			animation-timeline: scroll(root);
+			animation-range: 0 40svh;
+		}
+	}
+
+	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+		.vs-szablon-2 .vs-o-mnie__nakladka {
+			animation-range: 0 calc(var(--vs2-wzrost) * 0.8);
+		}
+	}
+}
+
+@keyframes vs-o-mnie2-nakladka-znika {
+	to {
+		opacity: 0;
+		translate: 0 -12px;
+	}
+}
+
+@keyframes vs-o-mnie2-podpis {
+	from {
+		clip-path: inset(-20% 100% -30% -10%);
+	}
+
+	to {
+		clip-path: inset(-20% -10% -30% -10%);
+	}
+}
+
+@keyframes vs-o-mnie2-linia {
+	from {
+		opacity: 0;
+		translate: 0 12px;
+	}
+}
+
 .vs-szablon-2 .vs-o-mnie__tresc {
 	grid-area: auto;
 	width: auto;
@@ -1961,9 +1907,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Komputer (Igor 21.10.2026: zdjęcie ma być widoczne w pierwszym ekranie, wyżej, a przy przewijaniu „jechać z nami”
- * do treści): karta zachodzi na zdjęcie pierwszego ekranu o zakładkę (--vs2-zakladka w baza.css: do 30 % szerokości
- * ekranu, twarz i dłoń od razu widać, karta zawsze pod paskiem). Jasne tło sekcji zaczyna się o jazdę karty
+ * Komputer (Igor 21.10.2026: zdjęcie ma być widoczne w pierwszym ekranie, a przy przewijaniu „jechać z nami” do treści):
+ * karta zaczyna się tuż pod paskiem (--vs2-karta-gora w baza.css), czyli zachodzi na zdjęcie o zakładkę
+ * (--vs2-zakladka), a biały napis Adriana stoi na dole za nią. Jasne tło sekcji zaczyna się o jazdę karty
  * (--vs2-jazda) niżej i wjeżdża od dołu.
  */
 @media (min-width: 64rem) {
@@ -1979,10 +1925,10 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Jazda karty: sticky w torze wyższym od karty o jazdę. Karta stoi w miejscu, a pod nią nazwa zjeżdża po zdjęciu
- * pierwszego ekranu (hero/style.css) i wjeżdża jasne tło; gdy tło dojdzie do górnej krawędzi karty, karta na nim osiada
- * i dalej jedzie z treścią. Odnośnik „O mnie” prowadzi do osiadłej karty (ujemny scroll-margin o jazdę).
- * Ograniczony ruch: bez jazdy i bez dodatkowego przewijania, karta stoi na zdjęciu pierwszego ekranu.
+ * Jazda karty: sticky w torze wyższym od karty o jazdę. Karta stoi górną krawędzią pod paskiem i rośnie (niżej), a od
+ * dołu wjeżdża jasne tło i zakrywa biały napis jak w projekcie; gdy tło dojdzie do górnej krawędzi karty, karta na nim
+ * osiada i dalej jedzie z treścią. Odnośnik „O mnie” prowadzi do osiadłej karty (ujemny scroll-margin o jazdę).
+ * Ograniczony ruch: bez jazdy i bez dodatkowego przewijania.
  */
 @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
 	.vs-szablon-2 .vs-o-mnie {
@@ -1997,7 +1943,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	.vs-szablon-2 .vs-o-mnie__karta {
 		position: sticky;
-		top: calc(100svh - var(--vs2-zakladka));
+		top: var(--vs2-karta-gora);
 	}
 }
 
@@ -2012,10 +1958,38 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
+/*
+ * Wzrost karty (Igor 21.10.2026: „zmniejszyłbym to zdjęcie na początku, tak żeby Marta była widoczna prawie że cała …
+ * podczas scrollowania może się robić coraz większy i przyjąć postawę tą, którą ma teraz”): na starcie karta w skali
+ * --vs2-karta-start (view.js: cała mieści się w pierwszym ekranie), przez fazę wzrostu rośnie od górnej krawędzi
+ * do pełnej wielkości projektu. Skala to transform, więc układ strony się nie zmienia.
+ */
+@supports (animation-timeline: scroll()) {
+	@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+		.vs-szablon-2 .vs-o-mnie__karta {
+			transform-origin: 50% 0;
+			animation: vs-o-mnie2-karta 1300ms var(--vs-ruch-wyjscie) 150ms both, vs-o-mnie2-rosnie linear both;
+			animation-duration: 1300ms, auto;
+			animation-timeline: auto, scroll(root);
+			animation-range: normal, 0 var(--vs2-wzrost);
+		}
+	}
+}
+
 @keyframes vs-o-mnie2-karta {
 	from {
 		opacity: 0;
 		translate: 0 64px;
+	}
+}
+
+@keyframes vs-o-mnie2-rosnie {
+	from {
+		scale: var(--vs2-karta-start, 0.6);
+	}
+
+	to {
+		scale: 1;
 	}
 }
 
@@ -7168,6 +7142,95 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		scale: 1.02;
 	}
 }
+
+/*
+ * Przejazd po zdjęciu na komputerze (Igor 21.10.2026: „widać sam sufit … żeby podczas scrollowania od góry do dołu
+ * najpierw widoczna góra, a potem też dół … żeby cały salon też był widać”): zdjęcie ma pełną szerokość ekranu i własną
+ * wysokość (na szerokim ekranie wyższe niż ekran), po przypięciu jedzie w tempie przewijania od góry (sufit, lustra)
+ * do dołu (fotele, stół, donica), a arkusz z formularzem wjeżdża dopiero pod koniec przejazdu (wcześniej od razu
+ * przykrywał dolną ćwiartkę). Tylko translate (karta graficzna). Bez osi widoku albo przy ograniczonym ruchu zdjęcie
+ * stoi środkiem; na telefonie bez zmian (zdjęcie wypełnia ekran wysokością, fotele są w kadrze).
+ */
+@media (min-width: 64rem) {
+	.vs-szablon-2 .vs-kontakt__kadr {
+		overflow: clip;
+	}
+
+	.vs-szablon-2 .vs-kontakt__kadr img {
+		height: auto;
+		min-height: 100%;
+		translate: 0 calc((100svh - 100%) / 2);
+	}
+
+	.vs-szablon-2 .vs-kontakt__tresc {
+		margin-top: 30svh;
+	}
+}
+
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+		.vs-szablon-2 .vs-kontakt__kadr img {
+			animation: vs-kontakt2-zdjecie linear both, vs-kontakt2-przejazd linear both;
+			animation-duration: auto, auto;
+			animation-timeline: --vs-kontakt2, --vs-kontakt2;
+			animation-range: entry 0% cover 55%, contain 0vh contain 40vh;
+		}
+	}
+}
+
+@keyframes vs-kontakt2-przejazd {
+	from {
+		translate: 0 0;
+	}
+
+	to {
+		translate: 0 calc(100svh - 100%);
+	}
+}
+
+/*
+ * Telefon i tablet: zdjęcie wypełnia ramkę wysokością, a przy przewijaniu jedzie w poziomie od luster i foteli (lewa
+ * część) do okna z drzewkiem (prawa), zanim wjedzie arkusz; wcześniej było widać samo drzewko (kadr 74 %).
+ * Bez osi widoku albo przy ograniczonym ruchu stoi jak dawniej (74 % od lewej).
+ */
+@media (max-width: 63.99rem) {
+	.vs-szablon-2 .vs-kontakt__kadr {
+		overflow: clip;
+	}
+
+	.vs-szablon-2 .vs-kontakt__kadr img {
+		width: auto;
+		min-width: 100%;
+		max-width: none;
+		height: 100%;
+		translate: calc((100vw - 100%) * 0.74) 0;
+	}
+
+	.vs-szablon-2 .vs-kontakt__tresc {
+		margin-top: 14svh;
+	}
+}
+
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) and (max-width: 63.99rem) {
+		.vs-szablon-2 .vs-kontakt__kadr img {
+			animation: vs-kontakt2-zdjecie linear both, vs-kontakt2-poziomo linear both;
+			animation-duration: auto, auto;
+			animation-timeline: --vs-kontakt2, --vs-kontakt2;
+			animation-range: entry 0% cover 55%, contain 0vh contain 34vh;
+		}
+	}
+}
+
+@keyframes vs-kontakt2-poziomo {
+	from {
+		translate: 0 0;
+	}
+
+	to {
+		translate: calc(100vw - 100%) 0;
+	}
+}
 </style>
 <style>/*
  * Instagram (Igor 21.10.2026, wzór beautyismybusiness.pl, pod styl szablonu 1): jasna sekcja między czarnym kontaktem
@@ -7471,6 +7534,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	margin-top: clamp(48px, 5.2vw, 100px);
 }
 
+/* Drugi pasek (druga paczka postów) jest tylko na komputerze. */
+.vs-instagram__pas--wstecz {
+	display: none;
+}
+
 .vs-instagram__siatka {
 	margin: 0;
 	padding: 0;
@@ -7545,9 +7613,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		padding-left: var(--vs-margines);
 	}
 
+	/* Dwa paski jeden pod drugim, więc niższe niż jeden (1440 px: 302 px zamiast 374). */
 	.vs-instagram__post {
 		flex: none;
-		height: clamp(300px, 26vw, 500px);
+		height: clamp(260px, 21vw, 420px);
+	}
+
+	.vs-instagram__pas--wstecz {
+		display: block;
+		margin-top: var(--vs-instagram-odstep);
 	}
 }
 
@@ -7713,8 +7787,10 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Ruch. Komputer: pętla paska (tor jedzie o szerokość jednej listy, druga lista to kopia, więc szew jest niewidoczny)
- * i przesunięcie całego paska w bok przy przewijaniu; 6 s na post, najechanie i fokus zatrzymują pętlę.
+ * Ruch. Komputer: pętla paska (tor jedzie o szerokość jednej listy z trzech, kopie ukrywają szew) i przesunięcie
+ * całego paska w bok przy przewijaniu; 6 s na post, najechanie i fokus zatrzymują pętlę. Dolny pasek (Igor: „druga paczka
+ * postów idzie od lewej do prawej … podczas scrolla jeszcze szybciej”) jedzie w prawo: pętla od końca, a przesunięcie
+ * przy przewijaniu z lewej do zera, więc przy lewej krawędzi nigdy nie ma przerwy.
  * Telefon i tablet: zdjęcie w kaflu jak w oknie, przesuwa się o 10 % wysokości w tempie przewijania (powiększone o 12 %,
  * żeby brzegi nie odsłaniały tła).
  */
@@ -7740,11 +7816,19 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			animation-play-state: paused;
 		}
 
+		.vs-ruch .vs-instagram__pas--wstecz .vs-instagram__tor {
+			animation-direction: reverse;
+		}
+
 		@supports (animation-timeline: view()) {
 			.vs-ruch .vs-instagram__przesuw {
 				animation: vs-instagram-przesuw linear both;
 				animation-timeline: view();
 				animation-range: entry 0% exit 100%;
+			}
+
+			.vs-ruch .vs-instagram__pas--wstecz .vs-instagram__przesuw {
+				animation-name: vs-instagram-przesuw-wstecz;
 			}
 		}
 	}
@@ -7769,7 +7853,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 @keyframes vs-instagram-petla {
 	to {
-		translate: -50% 0;
+		translate: calc(-100% / 3) 0;
 	}
 }
 
@@ -7781,6 +7865,16 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	to {
 		translate: -16vw 0;
+	}
+}
+
+@keyframes vs-instagram-przesuw-wstecz {
+	from {
+		translate: -16vw 0;
+	}
+
+	to {
+		translate: 0 0;
 	}
 }
 
@@ -8415,19 +8509,22 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		/* Ruch po ekranie (pokaz zdjęć, rozwinięcie akordeonu): mocne ease-in-out, spokojnie jak cały styl. */
 		--vs2-ruch: var(--wp--custom--ruch--w-miejscu, cubic-bezier(0.77, 0, 0.175, 1));
 		/*
-		 * Karta portretu O mnie na komputerze (Igor 21.10.2026): zachodzi na zdjęcie pierwszego ekranu o zakładkę (do 30 %
-		 * szerokości ekranu, zawsze pod paskiem) i jedzie z przewijaniem o --vs2-jazda, aż dojdzie do niej jasne tło sekcji.
+		 * Karta portretu O mnie na komputerze (Igor 21.10.2026: „zdjęcie dajemy główne wyżej”, „ta babka jest bardziej
+		 * widoczna i ten napis jest bardziej widoczny na dole”): górna krawędź tuż pod paskiem (--vs2-karta-gora), więc
+		 * karta zachodzi na zdjęcie pierwszego ekranu o zakładkę i jedzie z przewijaniem o --vs2-jazda, aż dojdzie do niej
+		 * jasne tło sekcji O mnie. Z osią przewijania przez pierwsze 60 % jazdy rośnie (--vs2-wzrost, o-mnie/style.css).
 		 */
-		--vs2-zakladka: min(30vw, 100svh - var(--vs-pasek) - 32px);
+		--vs2-karta-gora: calc(var(--vs-pasek) + clamp(48px, 9svh, 112px));
+		--vs2-zakladka: calc(100svh - var(--vs2-karta-gora));
+		--vs2-wzrost: 0px;
 		--vs2-jazda: var(--vs2-zakladka);
 		font-synthesis-weight: none;
 	}
 
-	/* Z osią przewijania jazda jest dwa razy dłuższa: najpierw nazwa zjeżdża po zdjęciu (hero/style.css), potem jasne tło. */
 	@supports (animation-timeline: scroll()) {
 		@media (prefers-reduced-motion: no-preference) {
 			.vs-szablon-2 {
-				--vs2-jazda: calc(2 * var(--vs2-zakladka));
+				--vs2-wzrost: calc(0.6 * var(--vs2-zakladka));
 			}
 		}
 	}
@@ -8529,6 +8626,32 @@ if ( menu ) {
 			menu.hidePopover();
 		}
 	} );
+}
+</script>
+<script type="module">/**
+ * O mnie w szablonie 2 (komputer): karta portretu na starcie jest mniejsza i mieści się cała w pierwszym ekranie, a przy
+ * przewijaniu rośnie do pełnej wielkości (style.css, oś przewijania). Skala startowa to stosunek wolnej wysokości okna
+ * do wysokości karty (dwie długości, których CSS nie podzieli), więc liczymy ją raz i przy zmianie rozmiaru okna:
+ * --vs2-karta-start = (wysokość okna - górna krawędź karty - 24 px) / wysokość karty, od 0,35 do 1.
+ * Bez karty przyklejonej (telefon, ograniczony ruch, szablony 1 i 3) skrypt nic nie robi.
+ */
+const karta = document.querySelector( '.vs-szablon-2 .vs-o-mnie__karta' );
+
+if ( karta ) {
+	const licz = () => {
+		const styl = getComputedStyle( karta );
+		const gora = parseFloat( styl.top );
+		const wysokosc = karta.offsetHeight;
+		if ( 'sticky' !== styl.position || ! Number.isFinite( gora ) || ! wysokosc ) {
+			document.documentElement.style.removeProperty( '--vs2-karta-start' );
+			return;
+		}
+		const skala = Math.min( 1, Math.max( 0.35, ( innerHeight - gora - 24 ) / wysokosc ) );
+		document.documentElement.style.setProperty( '--vs2-karta-start', skala.toFixed( 3 ) );
+	};
+
+	licz();
+	addEventListener( 'resize', licz );
 }
 </script>
 <script type="module">/**
@@ -9651,10 +9774,10 @@ if ( czekajace.size ) {
 		<a class="vs-przycisk vs-instagram__obserwuj" href="https://www.instagram.com/paulinaszymecka_instruktor/" target="_blank" rel="noopener" data-vs-wjazd><svg class="vs-instagram__ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,82a46,46,0,1,0,46,46A46.06,46.06,0,0,0,128,82Zm0,80a34,34,0,1,1,34-34A34,34,0,0,1,128,162ZM176,26H80A54.06,54.06,0,0,0,26,80v96a54.06,54.06,0,0,0,54,54h96a54.06,54.06,0,0,0,54-54V80A54.06,54.06,0,0,0,176,26Zm42,150a42,42,0,0,1-42,42H80a42,42,0,0,1-42-42V80A42,42,0,0,1,80,38h96a42,42,0,0,1,42,42ZM190,76a10,10,0,1,1-10-10A10,10,0,0,1,190,76Z"/></svg><span>Obserwuj na Instagramie</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span></a>
 	</div>
 
-		<div class="vs-instagram__pas">
-		<div class="vs-instagram__przesuw">
-			<div class="vs-instagram__tor" style="--vs-instagram-czas: 36s">
-				<ul class="vs-instagram__siatka" role="list">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<div class="vs-instagram__pas">
+			<div class="vs-instagram__przesuw">
+				<div class="vs-instagram__tor" style="--vs-instagram-czas: 36s">
+					<ul class="vs-instagram__siatka" role="list">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
 			<a class="vs-instagram__link" href="https://www.instagram.com/p/Ddl5ytvt4Ji/" target="_blank" rel="noopener">
 				<img width="1309" height="1546" src="media/instagram-1.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>64</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>6</span></span>				<span class="vs-ukryte">Post z 22 września 2026 na Instagramie, 64 polubienia, 6 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
 		</li>
@@ -9702,10 +9825,112 @@ if ( czekajace.size ) {
 			<a class="vs-instagram__link" href="https://www.instagram.com/p/DKAHLcIseLE/" target="_blank" rel="noopener" tabindex="-1">
 				<img width="1217" height="1522" src="media/instagram-6.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>117</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>41</span></span>				<span class="vs-ukryte">Post z 23 maja 2025 na Instagramie, 117 polubień, 41 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
 		</li>
-		</ul>			</div>
+		</ul><ul class="vs-instagram__siatka vs-instagram__siatka--kopia" role="list" aria-hidden="true">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/Ddl5ytvt4Ji/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="1309" height="1546" src="media/instagram-1.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>64</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>6</span></span>				<span class="vs-ukryte">Post z 22 września 2026 na Instagramie, 64 polubienia, 6 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DVS4PuXjZTZ/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="981" height="1141" src="media/instagram-2.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>91</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>3</span></span>				<span class="vs-ukryte">Post z 28 lutego 2026 na Instagramie, 91 polubień, 3 komentarze</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DT5wwbbjaF4/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="1200" height="1600" src="media/instagram-3.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>72</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>1</span></span>				<span class="vs-ukryte">Post z 24 stycznia 2026 na Instagramie, 72 polubienia, 1 komentarz</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DRz9sNtjU2P/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="1200" height="1600" src="media/instagram-4.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>38</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>7</span></span>				<span class="vs-ukryte">Post z 3 grudnia 2025 na Instagramie, 38 polubień, 7 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DRseioRjch6/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="1036" height="1289" src="media/instagram-5.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>33</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>0</span></span>				<span class="vs-ukryte">Post z 30 listopada 2025 na Instagramie, 33 polubienia, 0 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DKAHLcIseLE/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="1217" height="1522" src="media/instagram-6.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>117</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>41</span></span>				<span class="vs-ukryte">Post z 23 maja 2025 na Instagramie, 117 polubień, 41 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+		</ul>				</div>
+			</div>
 		</div>
-	</div>
-</section>
+			<div class="vs-instagram__pas vs-instagram__pas--wstecz">
+			<div class="vs-instagram__przesuw">
+				<div class="vs-instagram__tor" style="--vs-instagram-czas: 36s">
+					<ul class="vs-instagram__siatka" role="list">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdPTPR5u7QE/" target="_blank" rel="noopener">
+				<img width="360" height="640" src="media/instagram-7.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>78</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>8</span></span>				<span class="vs-ukryte">Rolka z 13 września 2026 na Instagramie, 78 polubień, 8 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdCHutQNY3K/" target="_blank" rel="noopener">
+				<img width="360" height="640" src="media/instagram-8.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>48</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>14</span></span>				<span class="vs-ukryte">Rolka z 8 września 2026 na Instagramie, 48 polubień, 14 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/Dc6YtuEDdVZ/" target="_blank" rel="noopener">
+				<img width="512" height="640" src="media/instagram-9.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>45</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>6</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 5 września 2026 na Instagramie, 45 polubień, 6 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DZ2pb9pDTL8/" target="_blank" rel="noopener">
+				<img width="512" height="640" src="media/instagram-10.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>82</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>15</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 21 czerwca 2026 na Instagramie, 82 polubienia, 15 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DSDly_ZDvji/" target="_blank" rel="noopener">
+				<img width="360" height="640" src="media/instagram-11.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>100</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>12</span></span>				<span class="vs-ukryte">Rolka z 9 grudnia 2025 na Instagramie, 100 polubień, 12 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DPjn8b-DQsc/" target="_blank" rel="noopener">
+				<img width="361" height="640" src="media/instagram-12.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>40</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>4</span></span>				<span class="vs-ukryte">Rolka z 8 października 2025 na Instagramie, 40 polubień, 4 komentarze</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+		</ul><ul class="vs-instagram__siatka vs-instagram__siatka--kopia" role="list" aria-hidden="true">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdPTPR5u7QE/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-7.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>78</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>8</span></span>				<span class="vs-ukryte">Rolka z 13 września 2026 na Instagramie, 78 polubień, 8 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdCHutQNY3K/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-8.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>48</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>14</span></span>				<span class="vs-ukryte">Rolka z 8 września 2026 na Instagramie, 48 polubień, 14 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/Dc6YtuEDdVZ/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="512" height="640" src="media/instagram-9.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>45</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>6</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 5 września 2026 na Instagramie, 45 polubień, 6 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DZ2pb9pDTL8/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="512" height="640" src="media/instagram-10.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>82</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>15</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 21 czerwca 2026 na Instagramie, 82 polubienia, 15 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DSDly_ZDvji/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-11.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>100</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>12</span></span>				<span class="vs-ukryte">Rolka z 9 grudnia 2025 na Instagramie, 100 polubień, 12 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DPjn8b-DQsc/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="361" height="640" src="media/instagram-12.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>40</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>4</span></span>				<span class="vs-ukryte">Rolka z 8 października 2025 na Instagramie, 40 polubień, 4 komentarze</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+		</ul><ul class="vs-instagram__siatka vs-instagram__siatka--kopia" role="list" aria-hidden="true">		<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdPTPR5u7QE/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-7.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>78</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>8</span></span>				<span class="vs-ukryte">Rolka z 13 września 2026 na Instagramie, 78 polubień, 8 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DdCHutQNY3K/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-8.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>48</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>14</span></span>				<span class="vs-ukryte">Rolka z 8 września 2026 na Instagramie, 48 polubień, 14 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/Dc6YtuEDdVZ/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="512" height="640" src="media/instagram-9.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>45</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>6</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 5 września 2026 na Instagramie, 45 polubień, 6 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 0ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/p/DZ2pb9pDTL8/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="512" height="640" src="media/instagram-10.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,34H88a6,6,0,0,0-6,6V82H40a6,6,0,0,0-6,6V216a6,6,0,0,0,6,6H168a6,6,0,0,0,6-6V174h42a6,6,0,0,0,6-6V40A6,6,0,0,0,216,34ZM162,210H46V94H162Zm48-48H174V88a6,6,0,0,0-6-6H94V46H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>82</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>15</span></span>				<span class="vs-ukryte">Karuzela zdjęć z 21 czerwca 2026 na Instagramie, 82 polubienia, 15 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 80ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DSDly_ZDvji/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="360" height="640" src="media/instagram-11.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>100</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>12</span></span>				<span class="vs-ukryte">Rolka z 9 grudnia 2025 na Instagramie, 100 polubień, 12 komentarzy</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+				<li class="vs-instagram__post" data-vs-wjazd style="--vs-opoznienie: 160ms">
+			<a class="vs-instagram__link" href="https://www.instagram.com/reel/DPjn8b-DQsc/" target="_blank" rel="noopener" tabindex="-1">
+				<img width="361" height="640" src="media/instagram-12.webp" class="vs-instagram__zdjecie" alt="" loading="lazy" decoding="async" /><svg class="vs-instagram__rodzaj" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,106H86.68L209.53,73.57a6,6,0,0,0,4.26-7.38l-8.16-30a13.94,13.94,0,0,0-17-9.72L36.32,66.67a13.77,13.77,0,0,0-8.48,6.47,13.57,13.57,0,0,0-1.36,10.42L34,111.34c0,.22,0,.44,0,.66v88a14,14,0,0,0,14,14H208a14,14,0,0,0,14-14V112A6,6,0,0,0,216,106ZM125.75,55.48l33,19.07-42.43,11.2-33-19.07Zm66-17.41a1.92,1.92,0,0,1,2.34,1.26l6.57,24.18L175.26,70.2l-33-19.07ZM38.23,79.14a1.85,1.85,0,0,1,1.15-.87L66.86,71l33,19.08L44.66,104.68l-6.6-24.27A1.63,1.63,0,0,1,38.23,79.14ZM210,200a2,2,0,0,1-2,2H48a2,2,0,0,1-2-2V118H210Z"/></svg><span class="vs-instagram__staty" aria-hidden="true"><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"/></svg>40</span><span class="vs-instagram__stat"><svg class="vs-instagram__stat-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"/></svg>4</span></span>				<span class="vs-ukryte">Rolka z 8 października 2025 na Instagramie, 40 polubień, 4 komentarze</span><span class="vs-ukryte"> (otwiera się w nowej karcie)</span>			</a>
+		</li>
+		</ul>				</div>
+			</div>
+		</div>
+	</section>
 
 </main>
 

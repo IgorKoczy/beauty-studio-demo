@@ -8670,7 +8670,8 @@ for ( const formularz of document.querySelectorAll( '[data-vs-prosba]' ) ) {
  * Gdy liczby są w 60 % na ekranie, cyfry liczą się od zera do wartości z danych w 1,6 s (szybko na starcie, zwalniają
  * przed końcem, więc ostatnie cyfry widać), druga liczba rusza 150 ms później. „+” przy obserwujących wkręca się na
  * miejsce, gdy jego liczba dojdzie do końca (CSS, is-gotowe). Szerokość liczby jest na czas liczenia zablokowana na
- * końcowej, więc podpis i plus się nie przesuwają. Raz na wizytę. Format jak w render.php: 915, 1 206, 76,8 tys.
+ * końcowej (od chwili, gdy krój jest wczytany, w em, więc trzyma się też po zmianie rozmiaru okna), więc kolumna
+ * liczb, podpisy i plus się nie przesuwają. Raz na wizytę. Format jak w render.php: 915, 1 206, 76,8 tys.
  * Ograniczony ruch albo brak skryptu: gotowe liczby z serwera i widoczny plus.
  */
 const lista = document.querySelector( '.vs-instagram__liczby' );
@@ -8692,18 +8693,25 @@ if ( lista && ! spokojnie && 'IntersectionObserver' in window ) {
 	const ODSTEP = 150;
 	const zwalnia = ( t ) => 1 - Math.pow( 1 - t, 3 );
 
-	// Od razu zero (sekcja jest na dole strony, więc nikt nie zobaczy podmiany); plus schowany do końca liczenia.
-	for ( const el of cyfry ) {
-		el.textContent = formatuj( 0, Number( el.dataset.vsLicznik ) );
-	}
-	lista.classList.add( 'is-licznik' );
+	// Szerokość końcowej liczby w kroju liczb (Gilda), zanim pokażemy zero. Czekamy tylko na ten krój: fonts.ready
+	// czekałby też na inne kroje doczytywane przy przewijaniu (pomiar: liczenie ruszało dopiero po ok. 1 s).
+	// Pomiar: „polubień” jest węższe od „808+”, więc bez blokady kolumna liczb rosła razem z cyframi (27 px).
+	const styl = getComputedStyle( cyfry[ 0 ] );
+	const gotowy = document.fonts
+		.load( `${ styl.fontSize } ${ styl.fontFamily }` )
+		.catch( () => {} )
+		.then( () => {
+			for ( const el of cyfry ) {
+				el.style.minWidth = `${ el.getBoundingClientRect().width / parseFloat( getComputedStyle( el ).fontSize ) }em`;
+				// Od razu zero (sekcja jest na dole strony, więc nikt nie zobaczy podmiany); plus schowany do końca liczenia.
+				el.textContent = formatuj( 0, Number( el.dataset.vsLicznik ) );
+			}
+			lista.classList.add( 'is-licznik' );
+		} );
 
 	const licz = ( el, opoznienie ) => {
 		const cel = Number( el.dataset.vsLicznik );
 		const koniec = formatuj( cel, cel );
-		el.textContent = koniec;
-		el.style.minWidth = `${ el.getBoundingClientRect().width }px`;
-		el.textContent = formatuj( 0, cel );
 		let start = 0;
 		const krok = ( teraz ) => {
 			start ||= teraz + opoznienie;
@@ -8714,7 +8722,6 @@ if ( lista && ! spokojnie && 'IntersectionObserver' in window ) {
 				return;
 			}
 			el.textContent = koniec;
-			el.style.minWidth = '';
 			el.closest( 'li' ).classList.add( 'is-gotowe' );
 		};
 		requestAnimationFrame( krok );
@@ -8726,13 +8733,7 @@ if ( lista && ! spokojnie && 'IntersectionObserver' in window ) {
 				return;
 			}
 			obserwator.disconnect();
-			// Szerokość mierzymy w kroju liczb (Gilda), nie w zastępczym. Czekamy tylko na ten krój: fonts.ready czekałby
-			// też na inne kroje doczytywane przy przewijaniu (pomiar: liczenie ruszało dopiero po ok. 1 s).
-			const styl = getComputedStyle( cyfry[ 0 ] );
-			document.fonts
-				.load( `${ styl.fontSize } ${ styl.fontFamily }` )
-				.catch( () => {} )
-				.then( () => cyfry.forEach( ( el, i ) => licz( el, i * ODSTEP ) ) );
+			gotowy.then( () => cyfry.forEach( ( el, i ) => licz( el, i * ODSTEP ) ) );
 		},
 		{ threshold: 0.6 }
 	);
@@ -9320,9 +9321,9 @@ if ( czekajace.size ) {
 						<span class="vs-instagram__podpis">obserwujących</span>
 					</li>
 									<li>
-						<span class="vs-instagram__wartosc" aria-hidden="true"><span class="vs-instagram__cyfry" data-vs-licznik="511">511</span></span>
-						<span class="vs-ukryte">511</span>
-						<span class="vs-instagram__podpis">obserwowanych</span>
+						<span class="vs-instagram__wartosc" aria-hidden="true"><span class="vs-instagram__cyfry" data-vs-licznik="808">808</span><span class="vs-instagram__plus">+</span></span>
+						<span class="vs-ukryte">808+</span>
+						<span class="vs-instagram__podpis">polubień</span>
 					</li>
 							</ul>
 		

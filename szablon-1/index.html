@@ -4252,17 +4252,21 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*
  * Szablon 1 (czarno-biały Adriana): układ własny (szablon-1.php; Igor 21.10.2026: „wersja po swojemu … niepowtarzalny
  * layout lepiej pod ten akurat styl”), w języku projektu Adriana: wielkie słowo Gildą stoi na krawędzi czarnej sekcji,
- * prostokąt zdjęcia nachodzi na górę liter (jak „GALERIA” i „O MNIE”), cienkie szare linie.
+ * prostokąty zdjęć nachodzą na górę liter (jak „GALERIA” i „O MNIE”), cienkie szare linie.
  * - tło jasnoszare, między białym FAQ a czarnym Kontaktem (Igor: „może zróbmy po prostu szarą tą sekcję, bo kontakt
  *   mamy już czarny i stopkę mamy czarną”);
  * - u góry tytuł z lewej, z prawej dane w kolumnach z pionowymi liniami (jak kolumny stopki Adriana);
- * - mapa w ostrym prostokącie na szerokość treści, kafle w szarości i półprzezroczyste: widoczne, ale miękkie
- *   (Adrian: „mapka … zbyt nachalna jest jak na ten wzór strony”); zoom 13 w danych, widać dzielnicę i miasto;
- * - wielka nazwa miejsca na całą szerokość, linia bazowa na krawędzi czarnego Kontaktu, mapa zakrywa górę liter;
- * - pinezka czarna z białym logo na środku mapy, awatar w białej obwódce.
- * Telefon: tytuł, dane jedne pod drugimi (poziome linie), mapa 4:5, wielka nazwa.
+ * - mapa w ostrym prostokącie, kafle w szarości i półprzezroczyste: widoczne, ale miękkie (Adrian: „mapka … zbyt
+ *   nachalna jest jak na ten wzór strony”); zoom 13 w danych, widać dzielnicę i miasto;
+ * - ze zdjęciem gabinetu (vs-dojazd--zdjecie) dwa prostokąty jak zdjęcia nad „GALERIA”: wysokie zdjęcie z lewej
+ *   (30 %), z prawej tytuł, dane i niższa, szeroka mapa; między nimi prześwit, w którym widać górę liter;
+ * - wielkie „DOJAZD” (słowo uniwersalne, jak nazwy sekcji Adriana) na szerokość układu, linia bazowa na krawędzi
+ *   czarnego Kontaktu, zdjęcie i mapa zakrywają górę liter;
+ * - pinezka czarna z białym logo na środku mapy, awatar w białej obwódce; zdjęcie gabinetu w czerni i bieli.
+ * Telefon: tytuł, dane jedne pod drugimi (poziome linie), zdjęcie gabinetu 3:2, mapa 4:5, wielkie słowo.
  * Ruch inny niż fala Beauty Studio: mapę odsłania zasłona w kolorze tła, która zjeżdża w dół; w połowie odsłony spada
- * pinezka; litery nazwy rozchodzą się od środka w tempie przewijania (GALERIA wstaje, O MNIE zjeżdża się z prawej).
+ * pinezka; zdjęcie gabinetu oddala się przy przewijaniu; litery słowa rozchodzą się od środka w tempie przewijania
+ * (GALERIA wstaje, O MNIE zjeżdża się z prawej).
  */
 .vs-szablon-1 .vs-dojazd {
 	/* Jasnoszare tło: ok. 13 % szarości linii Adriana (#808080) na bieli. Ląd to to samo tło (kafle są półprzezroczyste),
@@ -4289,8 +4293,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	filter: grayscale(1) opacity(0.7);
 }
 
-.vs-szablon-1 .vs-dojazd__glowka,
-.vs-szablon-1 .vs-dojazd__mapa {
+.vs-szablon-1 .vs-dojazd__uklad {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	width: min(100% - 2 * var(--vs-margines), 1800px);
 }
 
@@ -4371,15 +4376,32 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Mapa jak zdjęcie: ostry prostokąt, nad wielką nazwą (zakrywa górę liter). Szerokość i wysokość w parzystych
+ * Mapa jak zdjęcie: ostry prostokąt, nad wielkim słowem (zakrywa górę liter). Szerokość i wysokość w parzystych
  * pikselach: środek mapy wypada wtedy na całym pikselu i żywa mapa (Leaflet zaokrągla) staje dokładnie na obrazie;
  * przy połówce piksela podmiana na jasnej, gęstej mapie była widoczna. Bez funkcji round() zostaje zwykła szerokość.
  */
 .vs-szablon-1 .vs-dojazd__mapa {
 	position: relative;
 	z-index: 1;
-	width: round(down, min(100% - 2 * var(--vs-margines), 1800px), 2px);
+	justify-self: end;
+	width: round(down, 100%, 2px);
 	margin: 0;
+}
+
+/* Zdjęcie gabinetu: na telefonie 3:2 nad mapą, na komputerze z lewej na całą wysokość układu; w czerni i bieli. */
+.vs-szablon-1 .vs-dojazd__zdjecie {
+	position: relative;
+	z-index: 1;
+	width: auto;
+	margin: 0 0 clamp(16px, 4vw, 24px);
+	overflow: hidden;
+}
+
+.vs-szablon-1 .vs-dojazd__zdjecie img {
+	width: 100%;
+	height: 100%;
+	aspect-ratio: 3 / 2;
+	filter: grayscale(1);
 }
 
 .vs-szablon-1 .vs-dojazd__plotno {
@@ -4463,10 +4485,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 }
 
 /*
- * Wielka nazwa miejsca: rozmiar z szerokości słowa w em (--szer, szablon-1.php), więc ma dokładnie szerokość mapy
+ * Wielkie słowo: rozmiar z szerokości słowa w em (--szer, szablon-1.php), więc ma dokładnie szerokość układu
  * (wspólne krawędzie; przy szerszym słowie spod mapy wystawały okruchy górnych szeryfów).
  * Linia bazowa na krawędzi sekcji (Gilda przy interlinii 1: linia bazowa 0,2 em nad dołem wiersza), mapa zakrywa
  * górne 20 % wersalików jak zdjęcia nad „GALERIA” (wersaliki od 0,1 em pod górą wiersza, wysokość 0,7 em).
+ * Słowo jest siostrą układu, więc zachodzi na nie dolna krawędź ostatniego wiersza (mapa i zdjęcie).
  */
 .vs-szablon-1 .vs-dojazd__miejsce {
 	position: relative;
@@ -4518,6 +4541,35 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		gap: 48px;
 	}
 
+	/* Ze zdjęciem: zdjęcie w lewej kolumnie (30 %) na obie kondygnacje, z prawej tytuł nad danymi i mapa. */
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__uklad {
+		grid-template-columns: minmax(0, 30fr) minmax(0, 66fr);
+		column-gap: 4%;
+	}
+
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__glowka {
+		grid-area: 1 / 2;
+		grid-template-columns: minmax(0, 1fr);
+		gap: clamp(28px, 2.5vw, 44px);
+	}
+
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__zdjecie {
+		grid-area: 1 / 1 / 3;
+		margin: 0;
+	}
+
+	/* Zdjęcie wypełnia ramkę, ale nie wyznacza jej wysokości (inaczej rozpychało wiersz z tytułem): wysokość daje
+	 * tytuł, dane i mapa. */
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__zdjecie img {
+		position: absolute;
+		inset: 0;
+		aspect-ratio: auto;
+	}
+
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__mapa {
+		grid-area: 2 / 2;
+	}
+
 	.vs-szablon-1 .vs-dojazd__dane {
 		grid-auto-flow: column;
 		justify-content: end;
@@ -4534,6 +4586,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		padding-right: 0;
 	}
 
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__dane {
+		justify-content: start;
+	}
+
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__kolumna:first-child {
+		padding-left: 0;
+		border-left: 0;
+	}
+
 	.vs-szablon-1 .vs-dojazd__mapa {
 		position: relative;
 		inset: auto;
@@ -4545,6 +4606,10 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		height: clamp(400px, 36vw, 640px);
 		height: round(down, clamp(400px, 36vw, 640px), 2px);
 		aspect-ratio: auto;
+	}
+
+	.vs-szablon-1 .vs-dojazd--zdjecie .vs-dojazd__plotno {
+		height: round(down, clamp(360px, 30vw, 560px), 2px);
 	}
 
 	/* Obraz mapy z punktem w (900, 550) z 2400 x 1100 (narzedzia/mapa.mjs dla szablonu 1), punkt na środku mapy. */
@@ -4591,9 +4656,23 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	}
 }
 
-/* Litery nazwy rozchodzą się od środka i pojawiają w tempie przewijania (oś widoku słowa); tylko translate i opacity. */
+/*
+ * Litery słowa rozchodzą się od środka i pojawiają w tempie przewijania (oś widoku słowa), zdjęcie gabinetu oddala się
+ * (skala 1,14 do 1 w ramce); tylko transform i opacity. Bez osi widoku i przy ograniczonym ruchu stoją na miejscu.
+ */
 @supports (animation-timeline: view()) {
 	@media (prefers-reduced-motion: no-preference) {
+		.vs-szablon-1 .vs-dojazd__zdjecie {
+			view-timeline: --vs-dojazd-zdjecie block;
+		}
+
+		.vs-szablon-1 .vs-dojazd__zdjecie img {
+			animation: vs-dojazd-zdjecie linear both;
+			animation-duration: auto;
+			animation-timeline: --vs-dojazd-zdjecie;
+			animation-range: entry 0% cover 60%;
+		}
+
 		.vs-szablon-1 .vs-dojazd__miejsce {
 			view-timeline: --vs-dojazd-miejsce block;
 		}
@@ -4604,6 +4683,16 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			animation-timeline: --vs-dojazd-miejsce;
 			animation-range: entry 0% cover 40%;
 		}
+	}
+}
+
+@keyframes vs-dojazd-zdjecie {
+	from {
+		scale: 1.14;
+	}
+
+	to {
+		scale: 1;
 	}
 }
 
@@ -6367,70 +6456,75 @@ if ( czekajace.size ) {
 </section>
 
 
-<section class="vs-dojazd wp-block-visual-scale-dojazd" id="dojazd" aria-labelledby="vs-dojazd-tytul" data-prog="0.3">
-	<div class="vs-dojazd__glowka">
-		<h2 class="vs-tytul vs-dojazd__tytul" id="vs-dojazd-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-dojazd__tytul-glowna"><span class="vs-ukryte">Zapraszam</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">Z</span><span class="vs-litera" style="--i: 1">a</span><span class="vs-litera" style="--i: 2">p</span><span class="vs-litera" style="--i: 3">r</span><span class="vs-litera" style="--i: 4">a</span><span class="vs-litera" style="--i: 5">s</span><span class="vs-litera" style="--i: 6">z</span><span class="vs-litera" style="--i: 7">a</span><span class="vs-litera" style="--i: 8">m</span></span></span></span></span> <span class="vs-tytul__dopisek vs-dojazd__tytul-dopisek">do gabinetu</span></h2>
-		<div class="vs-dojazd__dane">
-			<div class="vs-dojazd__kolumna vs-dojazd__adres-blok" data-vs-wjazd>
-				<p class="vs-dojazd__etykieta">Adres</p>
-				<address class="vs-dojazd__adres">
-											<span class="vs-dojazd__ulica">ul. Przykładowa 11</span>
-										<span>Kraków, Kazimierz</span>
-				</address>
+<section class="vs-dojazd vs-dojazd--zdjecie wp-block-visual-scale-dojazd" id="dojazd" aria-labelledby="vs-dojazd-tytul" data-prog="0.3">
+	<div class="vs-dojazd__uklad">
+		<div class="vs-dojazd__glowka">
+			<h2 class="vs-tytul vs-dojazd__tytul" id="vs-dojazd-tytul" data-vs-wjazd="tytul"><span class="vs-tytul__wiersz"><span class="vs-tytul__glowna vs-dojazd__tytul-glowna"><span class="vs-ukryte">Zapraszam</span><span class="vs-litery" aria-hidden="true"><span class="vs-litery__slowo"><span class="vs-litera" style="--i: 0">Z</span><span class="vs-litera" style="--i: 1">a</span><span class="vs-litera" style="--i: 2">p</span><span class="vs-litera" style="--i: 3">r</span><span class="vs-litera" style="--i: 4">a</span><span class="vs-litera" style="--i: 5">s</span><span class="vs-litera" style="--i: 6">z</span><span class="vs-litera" style="--i: 7">a</span><span class="vs-litera" style="--i: 8">m</span></span></span></span></span> <span class="vs-tytul__dopisek vs-dojazd__tytul-dopisek">do gabinetu</span></h2>
+			<div class="vs-dojazd__dane">
+				<div class="vs-dojazd__kolumna vs-dojazd__adres-blok" data-vs-wjazd>
+					<p class="vs-dojazd__etykieta">Adres</p>
+					<address class="vs-dojazd__adres">
+													<span class="vs-dojazd__ulica">ul. Przykładowa 11</span>
+												<span>Kraków, Kazimierz</span>
+					</address>
+									</div>
+
+				<div class="vs-dojazd__kolumna" data-vs-wjazd>
+					<a class="vs-przycisk vs-dojazd__trasa" href="https://www.google.com/maps/dir/?api=1&#038;destination=50.0515%2C19.9446" target="_blank" rel="noopener">
+						<svg class="vs-dojazd__ikona" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M21 3 3 10.5l7.5 3L13.5 21 21 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+						Wyznacz trasę						<span class="vs-ukryte">(otwiera się w nowym oknie)</span>
+					</a>
+				</div>
+
+									<div class="vs-dojazd__kolumna vs-dojazd__opinie" data-vs-wjazd>
+						<a class="vs-dojazd__ocena" href="#opinie"><span class="vs-dojazd__ocena-wynik"><span class="vs-dojazd__ocena-liczba">5,0</span><span class="vs-dojazd__ocena-gwiazdki"><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 0" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 3" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 4" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span></span><span class="vs-dojazd__ocena-opis"><span class="vs-dojazd__ocena-zrodlo"><svg class="vs-dojazd__ocena-znak" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 16" fill="currentColor" fill-rule="evenodd"><title>Booksy</title><path d="M68.72 3.921q.343-.001.685 0c.616.006.667.078.443.628q-.552 1.359-1.107 2.715l-2.506 6.103c-.193.47-.413.925-.704 1.343-.592.848-1.38 1.301-2.446 1.29a4.8 4.8 0 0 1-1.747-.325c-.357-.141-.518-.234-.297-.656.089-.17.145-.355.226-.53.213-.464.235-.467.708-.297.214.076.434.152.657.184.696.1 1.228-.143 1.602-.755.245-.402.318-.745.096-1.213-1.195-2.525-2.35-5.069-3.517-7.607-.072-.158-.147-.317-.207-.48-.089-.242-.018-.368.238-.391.227-.02.457-.004.686-.004 1.04.003.818-.105 1.216.792.799 1.797 1.582 3.6 2.377 5.398l.165.336s.052.108.117.108.161.01.235-.121c.029-.051.06-.127.09-.2a1 1 0 0 1 .024-.084c.755-1.915 1.494-3.836 2.242-5.754.187-.48.194-.478.723-.48M55.884 7.478c.63.219 1.282.364 1.898.622.491.205.948.455 1.323.838.907.927.741 2.66-.227 3.548-.604.552-1.327.831-2.143.884-1.322.086-2.543-.226-3.67-.907-.795-.48-.81-.526-.276-1.245.362-.486.315-.705 1.061-.2.85.575 1.8.853 2.843.764.382-.033.723-.147.99-.427.44-.462.38-1.072-.141-1.444-.363-.259-.792-.371-1.208-.506-.383-.125-.775-.222-1.16-.34a6 6 0 0 1-1.157-.502c-1.567-.868-1.482-2.765-.54-3.769.578-.616 1.302-.93 2.143-.984.175-.011.352-.002.527-.002 1.087-.039 2.074.3 3.007.818.384.215.407.325.185.71-.122.213-.255.418-.382.627-.122.202-.292.236-.496.14a5 5 0 0 1-.326-.172 4.7 4.7 0 0 0-1.95-.589 1.9 1.9 0 0 0-1.161.265c-.603.372-.62 1.044-.044 1.453.276.196.588.309.904.418m-8.277.24c-.242.254-.245.274-.02.57 1.082 1.42 2.168 2.835 3.25 4.255.121.159.35.299.238.535-.108.23-.357.177-.565.178-.281.003-.564-.014-.844.005-.312.021-.526-.09-.716-.34-.75-.99-1.516-1.97-2.279-2.95-.616-.79-.523-.745-1.005-.303-.322.318-.727.73-.877.943q-.092.165-.15.344c-.085.329-.056.672-.056.672v.44c.017.185.009.374 0 .563l-.008.174c-.014.333-.114.437-.444.45q-.475.018-.95 0c-.354-.015-.412-.077-.415-.453-.006-.89-.002-1.78-.002-2.67V1.02c0-.14.004-.279.002-.418-.005-.218.115-.33.318-.336.369-.012.739-.018 1.108-.002.26.011.36.13.382.401.01.122.003.245.003.367 0 2.251-.002 4.503.006 6.754v.429q.029.052.107.08c.162.055.28-.176.397-.297a630 630 0 0 0 3.64-3.787c.196-.207.397-.312.688-.295.385.021.773.007 1.16.005.165 0 .327.013.402.185.074.171-.08.252-.172.346-.674.688-1.354 1.37-2.029 2.058q-.589.6-1.169 1.208m-16.342.858c.005-2.586 1.936-4.84 4.888-4.841C39.233 3.733 41.108 6.22 41 8.594c.066 2.29-1.656 4.832-4.878 4.842-2.954.009-4.861-2.23-4.856-4.86m7.923.054c.083-1.534-1.203-3.4-3.282-3.237-1.054.083-1.835.566-2.355 1.448a3.3 3.3 0 0 0-.359 2.573c.53 2.06 2.684 2.93 4.379 2.018 1.108-.596 1.57-1.59 1.617-2.802m-19.24-.046c.002-2.422 1.835-4.853 4.882-4.85 3.029.001 4.904 2.371 4.865 4.852.013 2.547-1.883 4.87-4.933 4.85-3.023-.02-4.816-2.394-4.814-4.852m7.118 2.215a3.36 3.36 0 0 0 .299-3.996c-.59-.92-1.424-1.421-2.7-1.411-.623-.035-1.283.23-1.861.744-1.268 1.127-1.4 3.27-.246 4.6a2.986 2.986 0 0 0 4.508.063M11.554 4.137c.715-.42 1.51-.645 2.313-.611 1.708.07 3.056.842 3.948 2.32.53.877.713 1.833.7 2.853-.015 1.146-.343 2.166-1.083 3.04-.93 1.098-2.131 1.629-3.576 1.75-2.131.179-3.862-.689-5.488-1.897a40 40 0 0 0-2.456-1.719 4.3 4.3 0 0 0-1.198-.529c-.962-.253-1.886.113-2.405.953-.046.075-.095.149-.13.228-.104.239-.282.334-.543.325-.386-.012-.774.005-1.16-.005-.46-.013-.574-.176-.395-.594.606-1.416 1.675-2.308 3.179-2.652 1.395-.32 2.685-.039 3.84.805.68.496 1.34 1.02 2.027 1.504.933.658 1.892 1.294 3.005 1.6 1.175.325 2.33.283 3.372-.462.612-.439 1.015-1.017 1.131-1.76.155-.995.05-1.945-.58-2.787-1.186-1.586-3.502-1.51-4.582.169-.308.478-.5.996-.47 1.58.014.243.017.49-.007.732-.028.284-.193.392-.43.269a8 8 0 0 1-1.23-.807c-.194-.149-.159-.373-.159-.581q0-1.807.002-3.613c0-1.204-.003-2.409 0-3.613.002-.551.036-.58.61-.587h.527c.6.007.688.096.69.711q.002 1.205 0 2.409v.628c.002.651.007.66.548.341"/></svg></span><span class="vs-dojazd__ocena-tekst">Średnia z 64 opinii</span></span><span class="vs-ukryte">, ocena na 5</span></a>					</div>
 							</div>
+		</div>
 
-			<div class="vs-dojazd__kolumna" data-vs-wjazd>
-				<a class="vs-przycisk vs-dojazd__trasa" href="https://www.google.com/maps/dir/?api=1&#038;destination=50.0515%2C19.9446" target="_blank" rel="noopener">
-					<svg class="vs-dojazd__ikona" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M21 3 3 10.5l7.5 3L13.5 21 21 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-					Wyznacz trasę					<span class="vs-ukryte">(otwiera się w nowym oknie)</span>
-				</a>
-			</div>
-
-							<div class="vs-dojazd__kolumna vs-dojazd__opinie" data-vs-wjazd>
-					<a class="vs-dojazd__ocena" href="#opinie"><span class="vs-dojazd__ocena-wynik"><span class="vs-dojazd__ocena-liczba">5,0</span><span class="vs-dojazd__ocena-gwiazdki"><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 0" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 3" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><svg class="vs-dojazd__ocena-gwiazdka" style="--i: 4" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span></span><span class="vs-dojazd__ocena-opis"><span class="vs-dojazd__ocena-zrodlo"><svg class="vs-dojazd__ocena-znak" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 16" fill="currentColor" fill-rule="evenodd"><title>Booksy</title><path d="M68.72 3.921q.343-.001.685 0c.616.006.667.078.443.628q-.552 1.359-1.107 2.715l-2.506 6.103c-.193.47-.413.925-.704 1.343-.592.848-1.38 1.301-2.446 1.29a4.8 4.8 0 0 1-1.747-.325c-.357-.141-.518-.234-.297-.656.089-.17.145-.355.226-.53.213-.464.235-.467.708-.297.214.076.434.152.657.184.696.1 1.228-.143 1.602-.755.245-.402.318-.745.096-1.213-1.195-2.525-2.35-5.069-3.517-7.607-.072-.158-.147-.317-.207-.48-.089-.242-.018-.368.238-.391.227-.02.457-.004.686-.004 1.04.003.818-.105 1.216.792.799 1.797 1.582 3.6 2.377 5.398l.165.336s.052.108.117.108.161.01.235-.121c.029-.051.06-.127.09-.2a1 1 0 0 1 .024-.084c.755-1.915 1.494-3.836 2.242-5.754.187-.48.194-.478.723-.48M55.884 7.478c.63.219 1.282.364 1.898.622.491.205.948.455 1.323.838.907.927.741 2.66-.227 3.548-.604.552-1.327.831-2.143.884-1.322.086-2.543-.226-3.67-.907-.795-.48-.81-.526-.276-1.245.362-.486.315-.705 1.061-.2.85.575 1.8.853 2.843.764.382-.033.723-.147.99-.427.44-.462.38-1.072-.141-1.444-.363-.259-.792-.371-1.208-.506-.383-.125-.775-.222-1.16-.34a6 6 0 0 1-1.157-.502c-1.567-.868-1.482-2.765-.54-3.769.578-.616 1.302-.93 2.143-.984.175-.011.352-.002.527-.002 1.087-.039 2.074.3 3.007.818.384.215.407.325.185.71-.122.213-.255.418-.382.627-.122.202-.292.236-.496.14a5 5 0 0 1-.326-.172 4.7 4.7 0 0 0-1.95-.589 1.9 1.9 0 0 0-1.161.265c-.603.372-.62 1.044-.044 1.453.276.196.588.309.904.418m-8.277.24c-.242.254-.245.274-.02.57 1.082 1.42 2.168 2.835 3.25 4.255.121.159.35.299.238.535-.108.23-.357.177-.565.178-.281.003-.564-.014-.844.005-.312.021-.526-.09-.716-.34-.75-.99-1.516-1.97-2.279-2.95-.616-.79-.523-.745-1.005-.303-.322.318-.727.73-.877.943q-.092.165-.15.344c-.085.329-.056.672-.056.672v.44c.017.185.009.374 0 .563l-.008.174c-.014.333-.114.437-.444.45q-.475.018-.95 0c-.354-.015-.412-.077-.415-.453-.006-.89-.002-1.78-.002-2.67V1.02c0-.14.004-.279.002-.418-.005-.218.115-.33.318-.336.369-.012.739-.018 1.108-.002.26.011.36.13.382.401.01.122.003.245.003.367 0 2.251-.002 4.503.006 6.754v.429q.029.052.107.08c.162.055.28-.176.397-.297a630 630 0 0 0 3.64-3.787c.196-.207.397-.312.688-.295.385.021.773.007 1.16.005.165 0 .327.013.402.185.074.171-.08.252-.172.346-.674.688-1.354 1.37-2.029 2.058q-.589.6-1.169 1.208m-16.342.858c.005-2.586 1.936-4.84 4.888-4.841C39.233 3.733 41.108 6.22 41 8.594c.066 2.29-1.656 4.832-4.878 4.842-2.954.009-4.861-2.23-4.856-4.86m7.923.054c.083-1.534-1.203-3.4-3.282-3.237-1.054.083-1.835.566-2.355 1.448a3.3 3.3 0 0 0-.359 2.573c.53 2.06 2.684 2.93 4.379 2.018 1.108-.596 1.57-1.59 1.617-2.802m-19.24-.046c.002-2.422 1.835-4.853 4.882-4.85 3.029.001 4.904 2.371 4.865 4.852.013 2.547-1.883 4.87-4.933 4.85-3.023-.02-4.816-2.394-4.814-4.852m7.118 2.215a3.36 3.36 0 0 0 .299-3.996c-.59-.92-1.424-1.421-2.7-1.411-.623-.035-1.283.23-1.861.744-1.268 1.127-1.4 3.27-.246 4.6a2.986 2.986 0 0 0 4.508.063M11.554 4.137c.715-.42 1.51-.645 2.313-.611 1.708.07 3.056.842 3.948 2.32.53.877.713 1.833.7 2.853-.015 1.146-.343 2.166-1.083 3.04-.93 1.098-2.131 1.629-3.576 1.75-2.131.179-3.862-.689-5.488-1.897a40 40 0 0 0-2.456-1.719 4.3 4.3 0 0 0-1.198-.529c-.962-.253-1.886.113-2.405.953-.046.075-.095.149-.13.228-.104.239-.282.334-.543.325-.386-.012-.774.005-1.16-.005-.46-.013-.574-.176-.395-.594.606-1.416 1.675-2.308 3.179-2.652 1.395-.32 2.685-.039 3.84.805.68.496 1.34 1.02 2.027 1.504.933.658 1.892 1.294 3.005 1.6 1.175.325 2.33.283 3.372-.462.612-.439 1.015-1.017 1.131-1.76.155-.995.05-1.945-.58-2.787-1.186-1.586-3.502-1.51-4.582.169-.308.478-.5.996-.47 1.58.014.243.017.49-.007.732-.028.284-.193.392-.43.269a8 8 0 0 1-1.23-.807c-.194-.149-.159-.373-.159-.581q0-1.807.002-3.613c0-1.204-.003-2.409 0-3.613.002-.551.036-.58.61-.587h.527c.6.007.688.096.69.711q.002 1.205 0 2.409v.628c.002.651.007.66.548.341"/></svg></span><span class="vs-dojazd__ocena-tekst">Średnia z 64 opinii</span></span><span class="vs-ukryte">, ocena na 5</span></a>				</div>
-					</div>
-	</div>
-
-			<figure class="vs-dojazd__mapa">
-			<div
-				class="vs-dojazd__plotno"
-				data-vs-mapa
-				data-lat="50.0515"
-				data-lng="19.9446"
-				data-zoom="13"
-				data-przyciski="bottomleft"
-				data-js="assets/leaflet.js"
-				data-css="assets/leaflet.css"
-			>
-									<picture class="vs-dojazd__obraz">
-													<source media="(max-width: 63.99rem)" srcset="media/mapa-telefon.webp" width="1100" height="700">
-												<img src="media/mapa.webp" alt="" width="2400" height="1100" loading="lazy" decoding="async">
-					</picture>
-								<a
-					class="vs-pinezka"
-					href="https://www.google.com/maps/dir/?api=1&#038;destination=50.0515%2C19.9446"
-					target="_blank"
-					rel="noopener"
-					aria-label="Marta Majewska, ul. Przykładowa 11, Kraków. Wyznacz trasę w Google Maps (otwiera się w nowym oknie)"
+					<figure class="vs-dojazd__zdjecie">
+				<img width="1100" height="1833" src="media/salon.webp" class="attachment-full size-full" alt="Gabinet: jasne wnętrze z lustrami w łukach i fotelami" loading="lazy" decoding="async" />			</figure>
+		
+					<figure class="vs-dojazd__mapa">
+				<div
+					class="vs-dojazd__plotno"
+					data-vs-mapa
+					data-lat="50.0515"
+					data-lng="19.9446"
+					data-zoom="13"
+					data-przyciski="bottomleft"
+					data-js="assets/leaflet.js"
+					data-css="assets/leaflet.css"
 				>
-					<span class="vs-pinezka__cialo">
-													<span class="vs-pinezka__awatar">
-								<img width="192" height="192" src="media/awatar.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />							</span>
-												<span class="vs-pinezka__znak">
-							<span class="vs-wordmark"><span class="vs-wordmark__monogram" aria-hidden="true"><span class="vs-wordmark__monogram-litera" style="--i: 0">M</span><span class="vs-wordmark__monogram-litera" style="--i: 1">M</span></span><span class="vs-wordmark__glowna">Marta Majewska</span></span>							<span class="vs-pinezka__trasa">Wyznacz trasę <span class="vs-strzalka" aria-hidden="true">→</span></span>
+											<picture class="vs-dojazd__obraz">
+															<source media="(max-width: 63.99rem)" srcset="media/mapa-telefon.webp" width="1100" height="700">
+														<img src="media/mapa.webp" alt="" width="2400" height="1100" loading="lazy" decoding="async">
+						</picture>
+										<a
+						class="vs-pinezka"
+						href="https://www.google.com/maps/dir/?api=1&#038;destination=50.0515%2C19.9446"
+						target="_blank"
+						rel="noopener"
+						aria-label="Marta Majewska, ul. Przykładowa 11, Kraków. Wyznacz trasę w Google Maps (otwiera się w nowym oknie)"
+					>
+						<span class="vs-pinezka__cialo">
+															<span class="vs-pinezka__awatar">
+									<img width="192" height="192" src="media/awatar.webp" class="attachment-full size-full" alt="" loading="lazy" decoding="async" />								</span>
+														<span class="vs-pinezka__znak">
+								<span class="vs-wordmark"><span class="vs-wordmark__monogram" aria-hidden="true"><span class="vs-wordmark__monogram-litera" style="--i: 0">M</span><span class="vs-wordmark__monogram-litera" style="--i: 1">M</span></span><span class="vs-wordmark__glowna">Marta Majewska</span></span>								<span class="vs-pinezka__trasa">Wyznacz trasę <span class="vs-strzalka" aria-hidden="true">→</span></span>
+							</span>
+							<span class="vs-pinezka__ogon" aria-hidden="true"></span>
 						</span>
-						<span class="vs-pinezka__ogon" aria-hidden="true"></span>
-					</span>
-					<span class="vs-pinezka__punkt" aria-hidden="true"><span class="vs-pinezka__fala"></span></span>
-				</a>
+						<span class="vs-pinezka__punkt" aria-hidden="true"><span class="vs-pinezka__fala"></span></span>
+					</a>
+				</div>
+				<p class="vs-dojazd__osm">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+				<figcaption class="vs-ukryte">
+					Mapa dojazdu: Marta Majewska, ul. Przykładowa 11, Kraków				</figcaption>
+			</figure>
 			</div>
-			<p class="vs-dojazd__osm">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
-			<figcaption class="vs-ukryte">
-				Mapa dojazdu: Marta Majewska, ul. Przykładowa 11, Kraków			</figcaption>
-		</figure>
-	
-			<p class="vs-dojazd__miejsce" style="--szer: 5.649" aria-hidden="true">
-			<span class="vs-dojazd__litera" style="--d: -4">K</span><span class="vs-dojazd__litera" style="--d: -3">A</span><span class="vs-dojazd__litera" style="--d: -2">Z</span><span class="vs-dojazd__litera" style="--d: -1">I</span><span class="vs-dojazd__litera" style="--d: 0">M</span><span class="vs-dojazd__litera" style="--d: 1">I</span><span class="vs-dojazd__litera" style="--d: 2">E</span><span class="vs-dojazd__litera" style="--d: 3">R</span><span class="vs-dojazd__litera" style="--d: 4">Z</span>		</p>
+
+			<p class="vs-dojazd__miejsce" style="--szer: 4.092" aria-hidden="true">
+			<span class="vs-dojazd__litera" style="--d: -2.5">D</span><span class="vs-dojazd__litera" style="--d: -1.5">O</span><span class="vs-dojazd__litera" style="--d: -0.5">J</span><span class="vs-dojazd__litera" style="--d: 0.5">A</span><span class="vs-dojazd__litera" style="--d: 1.5">Z</span><span class="vs-dojazd__litera" style="--d: 2.5">D</span>		</p>
 	</section>
 
 

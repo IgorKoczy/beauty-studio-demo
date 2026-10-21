@@ -4255,22 +4255,44 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
  * fala i upadek pinezki z awatarem), ale lustrzanie i nocą:
  * - komputer: mapa od lewej krawędzi do 90 % szerokości, treść w prawej połowie na czerni; warstwa czerni z prawej
  *   z prostym, miękkim brzegiem (bez skosu: proste linie Adriana), przy wjeździe wpływa z prawej;
- * - kafle jak mapa nocą (zestawienie 4 filtrów, wybrany „głęboki”): odwrócona szarość, ląd #0c0c0c przechodzi
- *   w czarne tło sekcji bez krawędzi, ulice jaśniejsze, Wisła i podpisy czytelne;
+ * - kafle jak mapa nocą, spokojna (Adrian 21.10.2026: „mapka … zbyt nachalna jest jak na ten wzór strony”, Igor:
+ *   „delikatnie bardziej subtelnie … mniej chaotycznie”): odwrócona szarość z małym kontrastem, ląd ciemnoszary,
+ *   ulice, Wisła i podpisy ledwo zaznaczone; mapa wyłania się z czerni tylko wokół pinezki (światło niżej);
  * - pinezka biała z czarnym monogramem i nazwą (vs_logo), awatar w białej obwódce, biały punkt i fala;
  * - tytuł Gildą wersalikami w dwóch wierszach, adres i „Wyznacz trasę” jak w stopce, ocena jak w pierwszym ekranie.
  * Telefon: mapa na górze z prostym zanikiem w czerń, treść pod nią do lewej.
  */
 .vs-szablon-1 .vs-dojazd {
 	--vs-dojazd-tlo: var(--vs-ciemne);
-	--vs-dojazd-lad: #0c0c0c;
+	--vs-dojazd-lad: #181818;
 	--vs-dojazd-linia: color-mix(in srgb, var(--vs-linia) 62%, var(--vs-ciemne));
+	/* Promienie światła wokół pinezki (szerokość, wysokość); na komputerze mniejsze, niżej. */
+	--vs-dojazd-swiatlo: 80vw 70vw;
 	overflow-x: clip;
 	color: var(--vs-na-ciemnym);
 }
 
 .vs-szablon-1 .vs-dojazd .leaflet-tile-pane {
-	filter: grayscale(1) invert(0.92) contrast(1.3) brightness(0.75);
+	filter: grayscale(1) invert(1) contrast(0.42) brightness(0.27);
+}
+
+/*
+ * Światło wokół pinezki: dalej od adresu mapa gaśnie w czerń sekcji, więc widać spokojną plamę ulic przy gabinecie,
+ * a nie całe miasto. Warstwa nad mapą (Leaflet: mapa 400) i pod przyciskami +/− (800 i wyżej); środek przezroczysty,
+ * więc etykieta pinezki zostaje czysta. Obraz mapy (mapa.mjs) ma same kafle, światło dokłada ta warstwa.
+ */
+.vs-szablon-1 .vs-dojazd__plotno::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 450;
+	background: radial-gradient(
+		ellipse var(--vs-dojazd-swiatlo) at var(--vs-dojazd-punkt-x) 50%,
+		transparent 40%,
+		color-mix(in srgb, var(--vs-dojazd-tlo) 65%, transparent) 72%,
+		var(--vs-dojazd-tlo) 100%
+	);
+	pointer-events: none;
 }
 
 /* Telefon: prosty zanik w czerń od dołu (w szablonie 3 pochylony). */
@@ -4417,6 +4439,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	.vs-szablon-1 .vs-dojazd {
 		/* Adres na 25 % szerokości mapy (ok. 22 % sekcji): cała biała etykieta po odsłoniętej stronie, także na starcie fali. */
 		--vs-dojazd-punkt-x: 25%;
+		/* Procenty w rozmiarze gradientu z calc() Chrome odrzuca, więc vw i svh (mapa to 90 % szerokości sekcji). */
+		--vs-dojazd-swiatlo: clamp(300px, 27vw, 560px) clamp(330px, 48svh, 495px);
 	}
 
 	/* Mapa od lewej krawędzi do 90 %: pełna część warstwy zawsze przykrywa jej prawą krawędź, także przy fali. */
@@ -6017,7 +6041,6 @@ if ( czekajace.size ) {
 				<button class="vs-opinie__strzalka vs-opinie__strzalka--dalej" type="button" data-kierunek="1" aria-controls="vs-opinie-lista" hidden><svg class="vs-opinie__strzalka-ikona" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M180.24,132.24l-80,80a6,6,0,0,1-8.48-8.48L167.51,128,91.76,52.24a6,6,0,0,1,8.48-8.48l80,80A6,6,0,0,1,180.24,132.24Z"/></svg><span class="vs-ukryte">Następna opinia</span></button>
 			</div>
 		
-					<p class="vs-opinie__uwaga">Opinie i zdjęcia przykładowe z projektu szablonu.</p>
 			</div>
 </section>
 

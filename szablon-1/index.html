@@ -8381,7 +8381,12 @@ for ( const slider of document.querySelectorAll( '[data-vs-slider]' ) ) {
 }
 </script>
 <script type="module">/**
- * Dojazd: mapa od razu (gotowy obraz), sekwencja ruchu „fala, potem pinezka” i żywa mapa po niej.
+ * Dojazd: mapa od razu (gotowy obraz) i sekwencja ruchu „fala, potem pinezka”.
+ *
+ * Sam obraz, bez żywej mapy (Igor, 21.10.2026: stylowa mapka w kolorach strony z nazwami miejscowości, narzedzia/mapa.mjs):
+ * żywe kafle wyglądałyby inaczej (inne kolory, nazwy ulic, inny font), a obraz z naszego serwera wczytuje się od razu
+ * i nie łączy gości z obcymi serwerami. Trasę prowadzi pinezka i „Wyznacz trasę” (Google Maps).
+ * Bez obrazu w danych (klientka bez narzedzia/mapa.mjs) zostaje dawny tryb z żywą mapą Leaflet, opisany niżej.
  *
  * Szybkość (Igor, 20.10.2026: „mapka się bardzo wolno wczytuje … żeby to wczytywało się diametralnie od razu”):
  * kafle z tile.openstreetmap.org dla naszej okolicy nie leżą w pamięci ich serwera (0,3 do 1,5 s na kafel).
@@ -8406,23 +8411,12 @@ if ( sekcja && 'IntersectionObserver' in window ) {
 	let widoczna = false;
 	let mapaGotowa = ! plotno;
 
-	const zywaMapa = () => {
-		if ( plotno && ! plotno.dataset.vsStart ) {
-			plotno.dataset.vsStart = '1';
-			uruchomMape( plotno, () => plotno.classList.add( 'is-zywa' ) );
-		}
-	};
 	const ruszaj = () => {
 		if ( sekcja.classList.contains( 'is-fala' ) ) {
 			return;
 		}
 		sekcja.classList.add( 'is-fala' );
-		setTimeout( () => {
-			sekcja.classList.add( 'is-po-fali' );
-			if ( obraz ) {
-				zywaMapa();
-			}
-		}, 3200 );
+		setTimeout( () => sekcja.classList.add( 'is-po-fali' ), 3200 );
 	};
 	const sprobuj = () => widoczna && mapaGotowa && ruszaj();
 
@@ -8440,7 +8434,8 @@ if ( sekcja && 'IntersectionObserver' in window ) {
 	);
 	widok.observe( sekcja.querySelector( '.vs-dojazd__mapa' ) || sekcja );
 
-	if ( plotno ) {
+	// Skrypt żywej mapy tylko bez obrazu (dawny tryb).
+	if ( plotno && ! obraz ) {
 		const poZaladowaniu = () => wolnaChwila( 3000 ).then( () => wczytajLeaflet( plotno ) ).catch( () => {} );
 		if ( document.readyState === 'complete' ) {
 			poZaladowaniu();
@@ -9212,7 +9207,7 @@ if ( czekajace.size ) {
 					data-vs-mapa
 					data-lat="50.0515"
 					data-lng="19.9446"
-					data-zoom="13"
+					data-zoom="12"
 					data-przyciski="bottomleft"
 					data-js="assets/leaflet.js"
 					data-css="assets/leaflet.css"
@@ -9239,7 +9234,7 @@ if ( czekajace.size ) {
 						<span class="vs-pinezka__punkt" aria-hidden="true"><span class="vs-pinezka__fala"></span></span>
 					</a>
 				</div>
-				<p class="vs-dojazd__osm">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+				<p class="vs-dojazd__osm"><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
 				<figcaption class="vs-ukryte">
 					Mapa dojazdu: Marta Majewska, ul. Przykładowa 11, Kraków				</figcaption>
 			</figure>
